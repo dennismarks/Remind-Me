@@ -13,6 +13,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @IBOutlet weak var tableView: UITableView!
     var array = [Category]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     
     override func viewDidLoad() {
@@ -34,6 +35,23 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return array.count
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
+            self.context.delete(self.array[indexPath.row])
+            self.array.remove(at: indexPath.row)
+            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            self.save()
+            completion(true)
+        }
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { (action, view, completion) in
+            //            self.save()
+            completion(true)
+        }
+        //        deleteAction.image = UIImage(named: "delete-icon")
+        editAction.backgroundColor = .orange
+        return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
     func save() {
