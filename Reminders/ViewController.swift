@@ -12,12 +12,14 @@ import CoreData
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
+//    private let searchController = UISearchController(searchResultsController: nil)
     var array = [Category]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setUpSearchController()
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.title = "Reminders"
@@ -32,6 +34,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         load()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationItem.hidesSearchBarWhenScrolling = true
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationItem.hidesSearchBarWhenScrolling = false
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let data = array[indexPath.row] as Category
 //        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomCell
@@ -40,10 +52,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 //        cell.view.backgroundColor = .red
 //        cell.backgroundColor = UIColor.red
         cell.titleLabel.text = data.title
+        cell.titleLabel.textColor = .red
 //        cell.textLabel?.text = data.title
         cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.5) : UIColor.white
-        cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.darkGray : UIColor.black
+        cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.red : UIColor.black
         cell.layer.borderWidth = 0.3
         cell.layer.borderColor = UIColor.darkGray.cgColor
 //        cell.layer.cornerRadius = 10.0
@@ -52,6 +65,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 //        cell.layer.shadowRadius = 3.0
 //        cell.layer.shadowOpacity = 0.5
 //        cell.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+        
+        if cell.accessoryType == .checkmark {
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: cell.titleLabel.text!)
+            attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributeString.length))
+            cell.textLabel?.attributedText = attributeString
+        }
+        
+
+        
         return cell
     }
     
@@ -120,8 +142,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func load() {
-        let request : NSFetchRequest<Category> = Category.fetchRequest()
+    func load(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
         do {
             array = try context.fetch(request)
         } catch {
@@ -150,3 +171,31 @@ extension UIColor {
     }
 }
 
+extension ViewController: UISearchResultsUpdating {
+    
+    func setUpSearchController() {
+        navigationItem.searchController = UISearchController(searchResultsController: nil)
+        navigationItem.searchController!.searchBar.delegate = self as? UISearchBarDelegate
+        navigationItem.searchController!.searchResultsUpdater = self
+        navigationItem.searchController!.obscuresBackgroundDuringPresentation = false
+        definesPresentationContext = true
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text!)
+    }
+
+    private func filterContentForSearchText(_ searchText: String) {
+        if searchText == "" {
+            load()
+            tableView.reloadData()
+        } else {
+            let request : NSFetchRequest<Category> = Category.fetchRequest()
+            let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
+            request.predicate = predicate
+            load(with: request)
+            tableView.reloadData()
+        }
+    }
+    
+}
