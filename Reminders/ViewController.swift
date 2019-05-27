@@ -20,21 +20,54 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewDidLoad()
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.title = "Reminders"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        
+        // set up add button
+        let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
+        self.navigationItem.rightBarButtonItem = add
+        
+        tableView.separatorStyle = .none
+        
+        load()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let data = array[indexPath.row] as Category
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = data.title
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomCell
+        let cell = Bundle.main.loadNibNamed("CustomCell", owner: self, options: nil)?.first as! CustomCell
+        print(cell.frame.height)
+//        cell.view.backgroundColor = .red
+//        cell.backgroundColor = UIColor.red
+        cell.titleLabel.text = data.title
+//        cell.textLabel?.text = data.title
         cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.5) : UIColor.white
-        cell.textLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.darkGray : UIColor.black
-        //        cell.layer.cornerRadius = 15.0
+        cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.darkGray : UIColor.black
+        cell.layer.borderWidth = 0.3
+        cell.layer.borderColor = UIColor.darkGray.cgColor
+//        cell.layer.cornerRadius = 10.0
+        
+//        cell.layer.shadowColor = UIColor.black.cgColor
+//        cell.layer.shadowRadius = 3.0
+//        cell.layer.shadowOpacity = 0.5
+//        cell.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 44
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return array.count
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        array[indexPath.row].done = !array[indexPath.row].done
+        save()
+        self.tableView.reloadData()
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     @objc func addButtonPressed() {
@@ -73,7 +106,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             //            self.save()
             completion(true)
         }
-        //        deleteAction.image = UIImage(named: "delete-icon")
+//        deleteAction.image = UIImage(named: "delete")
+//        deleteAction.backgroundColor = .white
         editAction.backgroundColor = .orange
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
