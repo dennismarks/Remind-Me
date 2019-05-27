@@ -36,5 +36,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return array.count
     }
     
+    func save() {
+        do {
+            try self.context.save()
+        } catch {
+            print("Error saving context \(error)")
+        }
+    }
+    
+    func load() {
+        let request : NSFetchRequest<Category> = Category.fetchRequest()
+        do {
+            array = try context.fetch(request)
+        } catch {
+            print("Error fetchin data from context \(error)")
+        }
+    }
+    
 
 }
