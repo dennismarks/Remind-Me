@@ -9,11 +9,10 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ItemTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
-//    private let searchController = UISearchController(searchResultsController: nil)
-    var array = [Category]()
+    var array = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     
@@ -22,8 +21,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.setUpSearchController()
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        self.title = "Reminders"
-        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationController?.navigationBar.prefersLargeTitles = false
         
         // set up add button
         let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
@@ -45,9 +43,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let data = array[indexPath.row] as Category
+        let data = array[indexPath.row] as Item
 //        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomCell
-        let cell = Bundle.main.loadNibNamed("CustomCell", owner: self, options: nil)?.first as! CustomCell
+        let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         print(cell.frame.height)
 //        cell.view.backgroundColor = .red
 //        cell.backgroundColor = UIColor.red
@@ -55,10 +53,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.titleLabel.textColor = .red
 //        cell.textLabel?.text = data.title
         cell.accessoryType = data.done ? .checkmark : .none
-        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.5) : UIColor.white
+        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.3) : UIColor.white
         cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.red : UIColor.black
-        cell.layer.borderWidth = 0.3
-        cell.layer.borderColor = UIColor.darkGray.cgColor
+//        cell.layer.borderWidth = 0.3
+//        cell.layer.borderColor = UIColor.darkGray.cgColor
 //        cell.layer.cornerRadius = 10.0
         
 //        cell.layer.shadowColor = UIColor.black.cgColor
@@ -71,9 +69,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributeString.length))
             cell.textLabel?.attributedText = attributeString
         }
-        
-
-        
         return cell
     }
     
@@ -94,10 +89,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @objc func addButtonPressed() {
         var textField = UITextField()
-        let alert = UIAlertController(title: "Add new category", message: .none, preferredStyle: .alert)
-        let add = UIAlertAction(title: "Add Category", style: .default) { (UIAlertAction) in
+        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
+        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
             if let text = textField.text {
-                let item = Category(context: self.context)
+                let item = Item(context: self.context)
                 item.title = text
                 item.done = false
                 self.array.append(item)
@@ -142,7 +137,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func load(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
+    func load(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
         do {
             array = try context.fetch(request)
         } catch {
@@ -171,7 +166,7 @@ extension UIColor {
     }
 }
 
-extension ViewController: UISearchResultsUpdating {
+extension ItemTableViewController: UISearchResultsUpdating {
     
     func setUpSearchController() {
         navigationItem.searchController = UISearchController(searchResultsController: nil)
@@ -190,7 +185,7 @@ extension ViewController: UISearchResultsUpdating {
             load()
             tableView.reloadData()
         } else {
-            let request : NSFetchRequest<Category> = Category.fetchRequest()
+            let request : NSFetchRequest<Item> = Item.fetchRequest()
             let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
             request.predicate = predicate
             load(with: request)
