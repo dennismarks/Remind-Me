@@ -12,6 +12,12 @@ import CoreData
 class ItemTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
+    var selectedCategory : Category? {
+        // what should happen when a variable gets set with a new value
+        didSet {
+            load()
+        }
+    }
     var array = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
@@ -21,15 +27,14 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
         self.setUpSearchController()
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        self.navigationController?.navigationBar.prefersLargeTitles = false
+        self.navigationItem.largeTitleDisplayMode = .never
+        
         
         // set up add button
         let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
         self.navigationItem.rightBarButtonItem = add
         
         tableView.separatorStyle = .none
-        
-        load()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -95,6 +100,7 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 let item = Item(context: self.context)
                 item.title = text
                 item.done = false
+                item.parentCategory = self.selectedCategory
                 self.array.append(item)
                 self.save()
                 self.tableView.reloadData()
@@ -137,7 +143,16 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func load(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func load(with request: NSFetchRequest<Item> = Item.fetchRequest(), with predicate: NSPredicate? = nil) {
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let searchPredicate = predicate {
+            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, searchPredicate])
+            request.predicate = compoundPredicate
+        } else {
+            request.predicate = categoryPredicate
+        }
+        
         do {
             array = try context.fetch(request)
         } catch {
@@ -188,7 +203,7 @@ extension ItemTableViewController: UISearchResultsUpdating {
             let request : NSFetchRequest<Item> = Item.fetchRequest()
             let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
             request.predicate = predicate
-            load(with: request)
+            load(with: request, with: predicate)
             tableView.reloadData()
         }
     }
