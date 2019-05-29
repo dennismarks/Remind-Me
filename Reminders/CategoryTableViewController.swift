@@ -17,6 +17,10 @@ class CategoryTableViewController: UITableViewController {
     var dragInitialIndexPath: IndexPath?
     var dragCellSnapshot: UIView?
     
+    var curIndex = 0
+    var from = 0
+    var to = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpSearchController()
@@ -85,7 +89,8 @@ class CategoryTableViewController: UITableViewController {
             if let text = textField.text {
                 let category = Category(context: self.context)
                 category.name = text
-
+                category.position = Int16(self.curIndex)
+                self.curIndex += 1
                 self.array.append(category)
 //                self.array.append(category)
                 self.save()
@@ -185,7 +190,9 @@ extension CategoryTableViewController {
         if sender.state == .began {
             if indexPath != nil {
                 dragInitialIndexPath = indexPath
-
+                if self.from == 0 {
+                    from = dragInitialIndexPath!.row
+                }
                 let cell = tableView.cellForRow(at: indexPath!)
                 dragCellSnapshot = snapshotOfCell(inputView: cell!)
                 var center = cell?.center
@@ -236,7 +243,14 @@ extension CategoryTableViewController {
                     self.dragInitialIndexPath = nil
                     self.dragCellSnapshot?.removeFromSuperview()
                     self.dragCellSnapshot = nil
-
+                    
+                    self.array[self.to].position = Int16(self.to)
+                    self.array[self.from].position = Int16(self.from)
+                    
+                    print("from \(self.from)")
+                    print("to \(self.to)")
+                    
+                    self.save()
                 }
             })
         }
