@@ -9,6 +9,8 @@
 import UIKit
 
 class CustomCategoryCell: UITableViewCell {
+    
+    @IBOutlet weak var nameLabel: UILabel!
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -19,6 +21,20 @@ class CustomCategoryCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+    }
+    
+    override var frame: CGRect {
+        get {
+            return super.frame
+        }
+        set (newFrame) {
+            var frame =  newFrame
+            frame.origin.y += 5
+            frame.origin.x += 5
+            frame.size.height -= 7
+            frame.size.width -= 10
+            super.frame = frame
+        }
     }
     
 }

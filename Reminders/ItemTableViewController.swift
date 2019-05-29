@@ -16,6 +16,7 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
         // what should happen when a variable gets set with a new value
         didSet {
             load()
+            self.title = self.selectedCategory?.name
         }
     }
     var array = [Item]()
@@ -39,7 +40,7 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        navigationItem.hidesSearchBarWhenScrolling = true
+        navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -78,7 +79,7 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 44
+        return 48
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
