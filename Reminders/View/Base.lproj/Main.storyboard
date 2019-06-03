@@ -41,7 +41,14 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" id="WnV-5J-ELt"/>
+                    <navigationItem key="navigationItem" id="WnV-5J-ELt">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="d2G-Q4-gux">
+                            <connections>
+                                <action selector="addButtonPressed:" destination="BYZ-38-t0r" id="FDh-e5-IcP"/>
+                                <segue destination="gns-pz-aea" kind="presentation" identifier="goToAddNewItem" animates="NO" modalPresentationStyle="pageSheet" id="fnS-ke-jNi"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="yX5-IP-cxq" id="PiN-Qv-k5M"/>
                     </connections>
@@ -49,6 +56,46 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2116" y="116"/>
+        </scene>
+        <!--Add New Item View Controller-->
+        <scene sceneID="Mez-gU-IJC">
+            <objects>
+                <viewController storyboardIdentifier="AddNewItemViewController" id="gns-pz-aea" customClass="AddNewItemViewController" customModule="Reminders" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="yTt-tg-eBJ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fus-yA-ofU">
+                                <rect key="frame" x="164.5" y="617" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="donePressed:" destination="gns-pz-aea" eventType="touchUpInside" id="Fz7-ck-EHc"/>
+                                    <segue destination="BYZ-38-t0r" kind="show" identifier="goBack" id="19X-d5-R76"/>
+                                </connections>
+                            </button>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Yd9-sT-JZ1">
+                                <rect key="frame" x="175" y="318.5" width="25" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Yd9-sT-JZ1" firstAttribute="centerY" secondItem="yTt-tg-eBJ" secondAttribute="centerY" id="Nri-Lo-JWf"/>
+                            <constraint firstItem="Yd9-sT-JZ1" firstAttribute="centerX" secondItem="yTt-tg-eBJ" secondAttribute="centerX" id="cRJ-N1-ftO"/>
+                            <constraint firstItem="fus-yA-ofU" firstAttribute="centerX" secondItem="yTt-tg-eBJ" secondAttribute="centerX" id="iU2-6U-gbf"/>
+                            <constraint firstItem="mtp-ey-BaI" firstAttribute="bottom" secondItem="fus-yA-ofU" secondAttribute="bottom" constant="20" id="wZH-gY-exM"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="mtp-ey-BaI"/>
+                    </view>
+                    <connections>
+                        <outlet property="textField" destination="Yd9-sT-JZ1" id="OTE-qN-ohV"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Vae-ZX-KWD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2877.5999999999999" y="115.59220389805098"/>
         </scene>
         <!--Category Table View Controller-->
         <scene sceneID="BpE-aM-mcz">
@@ -102,4 +149,7 @@
             <point key="canvasLocation" x="478" y="116"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="H3g-Ub-qPN"/>
+    </inferredMetricsTieBreakers>
 </document>

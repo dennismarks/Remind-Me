@@ -92,7 +92,6 @@ class CategoryTableViewController: UITableViewController {
                 category.position = Int16(self.curIndex)
                 self.curIndex += 1
                 self.array.append(category)
-//                self.array.append(category)
                 self.save()
                 self.tableView.reloadData()
                 print("Saved new category")

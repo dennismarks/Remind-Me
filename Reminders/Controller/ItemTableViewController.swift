@@ -16,9 +16,11 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
         // what should happen when a variable gets set with a new value
         didSet {
             load()
+//            self.title = self.text
             self.title = self.selectedCategory?.name
         }
     }
+    var text = ""
     var array = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
@@ -29,11 +31,6 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.navigationItem.largeTitleDisplayMode = .never
-        
-        
-        // set up add button
-        let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
-        self.navigationItem.rightBarButtonItem = add
         
         tableView.separatorStyle = .none
     }
@@ -93,30 +90,38 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    @objc func addButtonPressed() {
-        var textField = UITextField()
-        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
-        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
-            if let text = textField.text {
-                let item = Item(context: self.context)
-                item.title = text
-                item.done = false
-                item.parentCategory = self.selectedCategory
-                self.array.append(item)
-                self.save()
-                self.tableView.reloadData()
-                print("Saved")
-            }
-        }
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
-        alert.addTextField { (UITextField) in
-            UITextField.placeholder = "Create new item"
-            textField = UITextField
-        }
-        alert.addAction(add)
-        alert.addAction(cancel)
-        present(alert, animated: true)
+    @IBAction func addButtonPressed(_ sender: Any) {
+        performSegue(withIdentifier: "goToAddNewItem", sender: self)
     }
+    
+//    func addButtonPressed() {
+//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+//        let pvc = storyboard.instantiateViewController(withIdentifier: "AddNewItemViewController") as? AddNewItemViewController
+////        pvc!.modalPresentationStyle = .overCurrentContext
+//        self.present(pvc!, animated: true, completion: nil)
+
+//        var textField = UITextField()
+//        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
+//        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
+//            if let text = textField.text {
+//                let item = Item(context: self.context)
+//                item.title = text
+//                item.done = false
+//                item.parentCategory = self.selectedCategory
+//                self.array.append(item)
+//                self.save()
+//                self.tableView.reloadData()
+//                print("Saved")
+//            }
+//        }
+//        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
+//        alert.addTextField { (UITextField) in
+//            UITextField.placeholder = "Create new item"
+//            textField = UITextField
+//        }
+//        alert.addAction(add)
+//        alert.addAction(cancel)
+//        present(alert, animated: true)
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
