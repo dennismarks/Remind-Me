@@ -167,6 +167,9 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="79.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="vcb-A7-I0F" kind="presentation" identifier="goToItems" id="E4m-Dj-5vP"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -192,20 +195,58 @@
             </objects>
             <point key="canvasLocation" x="477.60000000000002" y="937.78110944527748"/>
         </scene>
-        <!--Expanded View Controller-->
+        <!--Items View Controller-->
         <scene sceneID="jEs-jn-yHk">
             <objects>
-                <viewController id="vcb-A7-I0F" customClass="ExpandedViewController" customModule="Reminders" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="vcb-A7-I0F" customClass="ItemsViewController" customModule="Reminders" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="NxI-mD-6OG">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eEQ-W1-O7B">
+                                <rect key="frame" x="0.0" y="20" width="375" height="589"/>
+                                <color key="backgroundColor" red="0.68655608099999998" green="0.81780699700000004" blue="0.89516141319999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="ofk-nR-DJO">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ofk-nR-DJO" id="yjT-4O-dqi">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="vcb-A7-I0F" id="ei0-6B-5di"/>
+                                    <outlet property="delegate" destination="vcb-A7-I0F" id="ty9-Jh-E8s"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LDr-bD-PBC">
+                                <rect key="frame" x="170.5" y="617" width="34" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="backButtonPressed:" destination="vcb-A7-I0F" eventType="touchUpInside" id="NPt-Db-OE1"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="eEQ-W1-O7B" firstAttribute="trailing" secondItem="OAK-1b-3q6" secondAttribute="trailing" id="IRF-Vb-5K3"/>
+                            <constraint firstItem="LDr-bD-PBC" firstAttribute="centerX" secondItem="NxI-mD-6OG" secondAttribute="centerX" id="R9N-gm-JQ8"/>
+                            <constraint firstItem="eEQ-W1-O7B" firstAttribute="leading" secondItem="OAK-1b-3q6" secondAttribute="leading" id="Sg5-2H-qpC"/>
+                            <constraint firstItem="eEQ-W1-O7B" firstAttribute="top" secondItem="OAK-1b-3q6" secondAttribute="top" id="Z8k-fe-pPv"/>
+                            <constraint firstItem="LDr-bD-PBC" firstAttribute="top" secondItem="eEQ-W1-O7B" secondAttribute="bottom" constant="8" id="bKi-fM-tLF"/>
+                            <constraint firstItem="OAK-1b-3q6" firstAttribute="bottom" secondItem="LDr-bD-PBC" secondAttribute="bottom" constant="20" id="rKN-C5-2js"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="OAK-1b-3q6"/>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="eEQ-W1-O7B" id="igg-z3-IhK"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BgW-9M-Jha" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1297" y="938"/>
+            <point key="canvasLocation" x="1296.8" y="937.78110944527748"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

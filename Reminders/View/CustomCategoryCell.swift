@@ -23,18 +23,18 @@ class CustomCategoryCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    override var frame: CGRect {
-        get {
-            return super.frame
-        }
-        set (newFrame) {
-            var frame =  newFrame
-            frame.origin.y += 5
-            frame.origin.x += 5
-            frame.size.height -= 7
-            frame.size.width -= 10
-            super.frame = frame
-        }
-    }
+//    override var frame: CGRect {
+//        get {
+//            return super.frame
+//        }
+//        set (newFrame) {
+//            var frame =  newFrame
+//            frame.origin.y += 10
+//            frame.origin.x += 10
+//            frame.size.height -= 10
+//            frame.size.width -= 20
+//            super.frame = frame
+//        }
+//    }
     
 }
