@@ -11,7 +11,7 @@ import CoreData
 
 class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var itemTableView: UITableView!
     var selectedCategory : Category? {
         // what should happen when a variable gets set with a new value
         didSet {
@@ -19,12 +19,14 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.title = self.selectedCategory?.name
         }
     }
-//    var text = ""
+    var tableViewColour : String = ""
+    
     var array = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
 //        tableView.separatorStyle = .none
     }
     
@@ -57,7 +59,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         array[indexPath.row].done = !array[indexPath.row].done
         save()
-        self.tableView.reloadData()
+        self.itemTableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -65,7 +67,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
             self.context.delete(self.array[indexPath.row])
             self.array.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            self.itemTableView.deleteRows(at: [indexPath], with: .automatic)
             self.save()
             completion(true)
         }
@@ -80,9 +82,42 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func backButtonPressed(_ sender: UIButton) {
+        for item in selectedCategory!.items! {
+            print(item)
+        }
+//        print(selectedCategory?.items)
         self.dismiss(animated: true, completion: nil)
     }
     
+    @IBAction func addButtonPressed(_ sender: UIButton) {
+//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+//        let pvc = storyboard.instantiateViewController(withIdentifier: "AddNewItemViewController") as? AddNewItemViewController
+//        //        pvc!.modalPresentationStyle = .overCurrentContext
+//        self.present(pvc!, animated: true, completion: nil)
+        
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
+        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
+            if let text = textField.text {
+                let item = Item(context: self.context)
+                item.title = text
+                item.done = false
+                item.parentCategory = self.selectedCategory
+                self.array.append(item)
+                self.save()
+                self.itemTableView.reloadData()
+                print("Saved")
+            }
+        }
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
+        alert.addTextField { (UITextField) in
+            UITextField.placeholder = "Create new item"
+            textField = UITextField
+        }
+        alert.addAction(add)
+        alert.addAction(cancel)
+        present(alert, animated: true)
+    }
     
     func save() {
         do {
@@ -109,4 +144,31 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
 
+}
+
+
+extension ItemsViewController {
+    
+    func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+        
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+        
+        var rgbValue:UInt32 = 0
+        Scanner(string: cString).scanHexInt32(&rgbValue)
+        
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+    
 }

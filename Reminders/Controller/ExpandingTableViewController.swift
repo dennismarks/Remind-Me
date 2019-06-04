@@ -96,6 +96,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             destinationVC.transitioningDelegate = self
             destinationVC.modalPresentationStyle = .custom
             destinationVC.selectedCategory = array[curRow]
+            destinationVC.tableViewColour = colourArray[curRow]
         }
     }
     

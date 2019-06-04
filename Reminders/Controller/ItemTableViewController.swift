@@ -99,7 +99,7 @@ class ItemTableViewController: UIViewController, UITableViewDelegate, UITableVie
 //        let pvc = storyboard.instantiateViewController(withIdentifier: "AddNewItemViewController") as? AddNewItemViewController
 ////        pvc!.modalPresentationStyle = .overCurrentContext
 //        self.present(pvc!, animated: true, completion: nil)
-
+//
 //        var textField = UITextField()
 //        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
 //        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
