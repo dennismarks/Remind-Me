@@ -9,9 +9,16 @@
 import UIKit
 import CoreData
 
+protocol UpdateUIAfterGoBackDelegate {
+    func updateUI()
+}
+
 class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var itemTableView: UITableView!
+    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var addButton: UIButton!
+    
     var selectedCategory : Category? {
         // what should happen when a variable gets set with a new value
         didSet {
@@ -20,14 +27,20 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     var tableViewColour : String = ""
-    
+    var delegate : UpdateUIAfterGoBackDelegate?
     var array = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
-//        tableView.separatorStyle = .none
+        itemTableView.separatorStyle = .none
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
+            UIView.animate(withDuration: 0.8, animations: {
+                self.backButton.layer.opacity = 0.85
+                self.addButton.layer.opacity = 0.85
+            })
+        })
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -49,7 +62,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 48
+        return 50
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -82,10 +95,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func backButtonPressed(_ sender: UIButton) {
-        for item in selectedCategory!.items! {
-            print(item)
-        }
-//        print(selectedCategory?.items)
+        print("Back pressed")
+        self.delegate?.updateUI()
         self.dismiss(animated: true, completion: nil)
     }
     

@@ -159,6 +159,11 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="LOy-sA-au4">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <view key="tableFooterView" contentMode="scaleToFill" id="qNp-oa-qIm">
+                                    <rect key="frame" x="0.0" y="108" width="375" height="100"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </view>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="3hH-bc-3Hd">
                                         <rect key="frame" x="0.0" y="28" width="375" height="80"/>
@@ -226,7 +231,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eEQ-W1-O7B">
-                                <rect key="frame" x="0.0" y="20" width="375" height="589"/>
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="ofk-nR-DJO">
@@ -236,7 +241,6 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
-                                        <color key="backgroundColor" red="0.57254901960000004" green="0.82745098039999998" blue="0.94117647059999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -244,16 +248,24 @@
                                     <outlet property="delegate" destination="vcb-A7-I0F" id="ty9-Jh-E8s"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6JM-XZ-YLd">
-                                <rect key="frame" x="321" y="617" width="30" height="30"/>
-                                <state key="normal" title="Add"/>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6JM-XZ-YLd">
+                                <rect key="frame" x="157.5" y="591" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="Xu1-91-OOJ"/>
+                                    <constraint firstAttribute="width" constant="60" id="sQq-xk-6X3"/>
+                                </constraints>
+                                <state key="normal" image="add"/>
                                 <connections>
                                     <action selector="addButtonPressed:" destination="vcb-A7-I0F" eventType="touchUpInside" id="pb4-SJ-iEx"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LDr-bD-PBC">
-                                <rect key="frame" x="170.5" y="617" width="34" height="30"/>
-                                <state key="normal" title="Back"/>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LDr-bD-PBC">
+                                <rect key="frame" x="25" y="591" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="GU0-D2-92e"/>
+                                    <constraint firstAttribute="width" constant="60" id="OXr-z3-kBH"/>
+                                </constraints>
+                                <state key="normal" image="back"/>
                                 <connections>
                                     <action selector="backButtonPressed:" destination="vcb-A7-I0F" eventType="touchUpInside" id="NPt-Db-OE1"/>
                                 </connections>
@@ -261,18 +273,20 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="OAK-1b-3q6" firstAttribute="trailing" secondItem="6JM-XZ-YLd" secondAttribute="trailing" constant="24" id="H9W-eE-CvY"/>
+                            <constraint firstItem="OAK-1b-3q6" firstAttribute="bottom" secondItem="6JM-XZ-YLd" secondAttribute="bottom" constant="16" id="8h6-dS-780"/>
+                            <constraint firstItem="6JM-XZ-YLd" firstAttribute="centerX" secondItem="NxI-mD-6OG" secondAttribute="centerX" id="9xu-OJ-MIL"/>
                             <constraint firstItem="eEQ-W1-O7B" firstAttribute="trailing" secondItem="OAK-1b-3q6" secondAttribute="trailing" id="IRF-Vb-5K3"/>
-                            <constraint firstItem="LDr-bD-PBC" firstAttribute="centerX" secondItem="NxI-mD-6OG" secondAttribute="centerX" id="R9N-gm-JQ8"/>
                             <constraint firstItem="eEQ-W1-O7B" firstAttribute="leading" secondItem="OAK-1b-3q6" secondAttribute="leading" id="Sg5-2H-qpC"/>
                             <constraint firstItem="eEQ-W1-O7B" firstAttribute="top" secondItem="OAK-1b-3q6" secondAttribute="top" id="Z8k-fe-pPv"/>
-                            <constraint firstItem="LDr-bD-PBC" firstAttribute="top" secondItem="eEQ-W1-O7B" secondAttribute="bottom" constant="8" id="bKi-fM-tLF"/>
-                            <constraint firstItem="OAK-1b-3q6" firstAttribute="bottom" secondItem="6JM-XZ-YLd" secondAttribute="bottom" constant="20" id="qwn-wy-2gs"/>
-                            <constraint firstItem="OAK-1b-3q6" firstAttribute="bottom" secondItem="LDr-bD-PBC" secondAttribute="bottom" constant="20" id="rKN-C5-2js"/>
+                            <constraint firstItem="OAK-1b-3q6" firstAttribute="bottom" secondItem="LDr-bD-PBC" secondAttribute="bottom" constant="16" id="ZnI-Ja-Id0"/>
+                            <constraint firstItem="eEQ-W1-O7B" firstAttribute="bottom" secondItem="OAK-1b-3q6" secondAttribute="bottom" id="g7H-HO-Eev"/>
+                            <constraint firstItem="LDr-bD-PBC" firstAttribute="leading" secondItem="OAK-1b-3q6" secondAttribute="leading" constant="25" id="pGb-0V-Wag"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="OAK-1b-3q6"/>
                     </view>
                     <connections>
+                        <outlet property="addButton" destination="6JM-XZ-YLd" id="zlo-2j-Pvc"/>
+                        <outlet property="backButton" destination="LDr-bD-PBC" id="eOP-Nz-s1N"/>
                         <outlet property="itemTableView" destination="eEQ-W1-O7B" id="5bk-Ok-mQj"/>
                     </connections>
                 </viewController>
@@ -374,11 +388,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pbw-gg-vyU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2236" y="1711.3943028485758"/>
+            <point key="canvasLocation" x="2236" y="1577"/>
         </scene>
     </scenes>
     <resources>
         <image name="add" width="128" height="128"/>
+        <image name="back" width="128" height="128"/>
         <image name="dismiss" width="128" height="128"/>
         <image name="save" width="128" height="128"/>
     </resources>

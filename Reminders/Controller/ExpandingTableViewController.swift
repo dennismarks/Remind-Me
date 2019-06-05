@@ -11,7 +11,7 @@ import UIKit
 import CoreData
 
 
-class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIViewControllerTransitioningDelegate, UpdateMainViewDelegate {
+class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIViewControllerTransitioningDelegate, UpdateMainViewDelegate, UpdateUIAfterGoBackDelegate {
     
     @IBOutlet weak var statusBarView: UIView!
     @IBOutlet weak var tableView: UITableView!
@@ -32,7 +32,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
 //        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGesture(sender:)))
 //        longPress.minimumPressDuration = 0.2 // optional
 //        self.tableView.addGestureRecognizer(longPress)
@@ -52,11 +51,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        self.view.layer.opacity = 1.0
-    }
-        
     var openingFrame: CGRect?
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -99,17 +93,20 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         openingFrame = frameToOpenFrom
         
         curRow = indexPath.row
+        UIView.animate(withDuration: 0.065) {
+            self.addButton.layer.opacity = 0.0
+        }
         self.performSegue(withIdentifier: "goToItems", sender: self)
-
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToItems" {
             let destinationVC = segue.destination as! ItemsViewController
             destinationVC.transitioningDelegate = self
+            destinationVC.delegate = self
             destinationVC.modalPresentationStyle = .custom
             destinationVC.selectedCategory = array[curRow]
-            destinationVC.tableViewColour = colourArray[curRow]
+            destinationVC.tableViewColour = array[curRow].colour!
         }
         else if segue.identifier == "goToAddCategory" {
             let destinationVC = segue.destination as! AddNewCategoryViewController
@@ -139,9 +136,18 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func dismissView() {
+        print("Here1")
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
+    }
+    
+    func updateUI() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: {
+            UIView.animate(withDuration: 1, animations: {
+                self.addButton.layer.opacity = 0.85
+            })
+        })
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -149,8 +155,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
-        UIView.animate(withDuration: 0.5) {
-            self.view.layer.opacity = 0.5
+        UIView.animate(withDuration: 0.8) {
+            self.view.layer.opacity = 0.6
         }
         performSegue(withIdentifier: "goToAddCategory", sender: self)
         
@@ -357,3 +363,13 @@ extension ExpandingTableViewController: UIPopoverPresentationControllerDelegate 
         return .none
     }
 }
+
+//
+//extension ExpandingTableViewController:  {
+//
+//    func updateUI() {
+//        print("Here2")
+//        addButton.isHidden = false
+//    }
+//
+//}
