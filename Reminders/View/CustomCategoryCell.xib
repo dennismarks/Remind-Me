@@ -19,16 +19,15 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u62-p1-tne">
-                        <rect key="frame" x="12" y="10" width="42" height="79.5"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
+                        <rect key="frame" x="128" y="34.5" width="64" height="30.5"/>
+                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="26"/>
+                        <color key="textColor" red="0.075765387055837574" green="0.075765387055837574" blue="0.075765387055837574" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="u62-p1-tne" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="12" id="AGN-BC-zX6"/>
-                    <constraint firstItem="u62-p1-tne" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="l6d-J9-v1w"/>
-                    <constraint firstAttribute="bottom" secondItem="u62-p1-tne" secondAttribute="bottom" constant="10" id="uIT-EL-L8H"/>
+                    <constraint firstItem="u62-p1-tne" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="kbg-HG-YXa"/>
+                    <constraint firstItem="u62-p1-tne" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="rcw-Po-VuB"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>

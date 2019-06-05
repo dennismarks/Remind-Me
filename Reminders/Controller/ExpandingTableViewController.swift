@@ -17,7 +17,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIButton!
     
-    
     var array = [Category]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var dragInitialIndexPath: IndexPath?
@@ -33,9 +32,10 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGesture(sender:)))
-        longPress.minimumPressDuration = 0.2 // optional
-        self.tableView.addGestureRecognizer(longPress)
+        
+//        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGesture(sender:)))
+//        longPress.minimumPressDuration = 0.2 // optional
+//        self.tableView.addGestureRecognizer(longPress)
         
         self.tableView.separatorStyle = .none
         let window = UIApplication.shared.windows[0]
@@ -43,7 +43,13 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         statusBarView.frame.size.height = safeFrame.minY
 //        statusBarView.layer.cornerRadius = 12.0
         load()
+        curIndex = self.array.count
+        print(curIndex)
         self.view.layer.opacity = 1.0
+        
+        for item in array {
+            print(item.name!, item.position)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -112,12 +118,12 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             popOverVC?.delegate = self
             popOverVC?.sourceView = self.addButton
             popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
-            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width - 3, height: self.view.frame.width - 3)
+            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width - 3, height: self.view.frame.height - 3)
         }
     }
     
     func addNewCategory() {
-        UIView.animate(withDuration: 1.0) {
+        UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
     }
@@ -155,12 +161,33 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
 //        alert.addAction(cancel)
 //        present(alert, animated: true)
     }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
+            self.context.delete(self.array[indexPath.row])
+            self.array.remove(at: indexPath.row)
+            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            self.save()
+            completion(true)
+        }
+//        let editAction = UIContextualAction(style: .normal, title: "Edit") { (action, view, completion) in
+//            //            self.save()
+//            completion(true)
+//        }
+        //        deleteAction.image = UIImage(named: "delete")
+        //        deleteAction.backgroundColor = .white
+//        editAction.backgroundColor = .orange
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
     
     
     func save() {
         do {
             try self.context.save()
             print("Saved data")
+            for item in array {
+                print(item.name!, item.position)
+            }
         } catch {
             print("Error saving context \(error)")
         }
@@ -208,97 +235,103 @@ extension ExpandingTableViewController {
 
 // MARK: cell reorder / long press
 
-extension ExpandingTableViewController {
-    
-    @objc func onLongPressGesture(sender: UILongPressGestureRecognizer) {
-        let locationInView = sender.location(in: tableView)
-        let indexPath = tableView.indexPathForRow(at: locationInView)
-        
-        if sender.state == .began {
-            if indexPath != nil {
-                dragInitialIndexPath = indexPath
-                if self.from == 0 {
-                    from = dragInitialIndexPath!.row
-                }
-                let cell = tableView.cellForRow(at: indexPath!)
-                dragCellSnapshot = snapshotOfCell(inputView: cell!)
-                var center = cell?.center
-                dragCellSnapshot?.center = center!
-                dragCellSnapshot?.alpha = 0.0
-                tableView.addSubview(dragCellSnapshot!)
-                
-                UIView.animate(withDuration: 0.25, animations: { () -> Void in
-                    center?.y = locationInView.y
-                    self.dragCellSnapshot?.center = center!
-                    self.dragCellSnapshot?.transform = (self.dragCellSnapshot?.transform.scaledBy(x: 1.05, y: 1.05))!
-                    self.dragCellSnapshot?.alpha = 0.99
-                    cell?.alpha = 0.0
-                }, completion: { (finished) -> Void in
-                    if finished {
-                        cell?.isHidden = true
-                    }
-                })
-            }
-        } else if sender.state == .changed && dragInitialIndexPath != nil {
-            var center = dragCellSnapshot?.center
-            center?.y = locationInView.y
-            dragCellSnapshot?.center = center!
-            
-            // to lock dragging to same section add: "&& indexPath?.section == dragInitialIndexPath?.section" to the if below
-            if indexPath != nil && indexPath != dragInitialIndexPath {
-                // update your data model
-                print("1 drag \(String(describing: dragInitialIndexPath?.row))")
-                let dataToMove = array[dragInitialIndexPath!.row]
-                array.remove(at: dragInitialIndexPath!.row)
-                array.insert(dataToMove, at: indexPath!.row)
-                tableView.moveRow(at: dragInitialIndexPath!, to: indexPath!)
-                dragInitialIndexPath = indexPath
-                print("2 drag \(String(describing: dragInitialIndexPath?.row))")
-                self.to = indexPath!.row
-            }
-        } else if sender.state == .ended && dragInitialIndexPath != nil {
-            let cell = tableView.cellForRow(at: dragInitialIndexPath!)
-            cell?.isHidden = false
-            cell?.alpha = 0.0
-            UIView.animate(withDuration: 0.25, animations: { () -> Void in
-                self.dragCellSnapshot?.center = (cell?.center)!
-                self.dragCellSnapshot?.transform = CGAffineTransform.identity
-                self.dragCellSnapshot?.alpha = 0.0
-                cell?.alpha = 1.0
-            }, completion: { (finished) -> Void in
-                if finished {
-                    self.dragInitialIndexPath = nil
-                    self.dragCellSnapshot?.removeFromSuperview()
-                    self.dragCellSnapshot = nil
-                    
-                    self.array[self.to].position = Int16(self.to)
-                    self.array[self.from].position = Int16(self.from)
-                    
-                    print("from \(self.from)")
-                    print("to \(self.to)")
-                    
-                    self.save()
-                }
-            })
-        }
-    }
-    
-    func snapshotOfCell(inputView: UIView) -> UIView {
-        UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
-        inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        let cellSnapshot = UIImageView(image: image)
-        cellSnapshot.layer.masksToBounds = false
-        cellSnapshot.layer.cornerRadius = 0.0
-        cellSnapshot.layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
-        cellSnapshot.layer.shadowRadius = 5.0
-        cellSnapshot.layer.shadowOpacity = 0.4
-        return cellSnapshot
-    }
-    
-}
+//extension ExpandingTableViewController {
+//
+//    @objc func onLongPressGesture(sender: UILongPressGestureRecognizer) {
+//        let locationInView = sender.location(in: tableView)
+//        let indexPath = tableView.indexPathForRow(at: locationInView)
+//
+//        if sender.state == .began {
+//            if indexPath != nil {
+//                dragInitialIndexPath = indexPath
+//                if self.from == 0 {
+//                    from = dragInitialIndexPath!.row
+//                }
+//                let cell = tableView.cellForRow(at: indexPath!)
+//                dragCellSnapshot = snapshotOfCell(inputView: cell!)
+//                var center = cell?.center
+//                dragCellSnapshot?.center = center!
+//                dragCellSnapshot?.alpha = 0.0
+//                tableView.addSubview(dragCellSnapshot!)
+//
+//                UIView.animate(withDuration: 0.25, animations: { () -> Void in
+//                    center?.y = locationInView.y
+//                    self.dragCellSnapshot?.center = center!
+//                    self.dragCellSnapshot?.transform = (self.dragCellSnapshot?.transform.scaledBy(x: 1.05, y: 1.05))!
+//                    self.dragCellSnapshot?.alpha = 0.99
+//                    cell?.alpha = 0.0
+//                }, completion: { (finished) -> Void in
+//                    if finished {
+//                        cell?.isHidden = true
+//                    }
+//                })
+//            }
+//        } else if sender.state == .changed && dragInitialIndexPath != nil {
+//            var center = dragCellSnapshot?.center
+//            center?.y = locationInView.y
+//            dragCellSnapshot?.center = center!
+//
+//            // to lock dragging to same section add: "&& indexPath?.section == dragInitialIndexPath?.section" to the if below
+//            if indexPath != nil && indexPath != dragInitialIndexPath {
+//                // update your data model
+////                print(" \(String(describing: dragInitialIndexPath?.row))")
+//                let dataToMove = array[dragInitialIndexPath!.row]
+//                array.remove(at: dragInitialIndexPath!.row)
+//                array.insert(dataToMove, at: indexPath!.row)
+//                tableView.moveRow(at: dragInitialIndexPath!, to: indexPath!)
+//                dragInitialIndexPath = indexPath
+////                print("2 drag \(String(describing: dragInitialIndexPath?.row))")
+//                self.to = indexPath!.row
+//            }
+//        } else if sender.state == .ended && dragInitialIndexPath != nil {
+//            let cell = tableView.cellForRow(at: dragInitialIndexPath!)
+//            cell?.isHidden = false
+//            cell?.alpha = 0.0
+//            UIView.animate(withDuration: 0.25, animations: { () -> Void in
+//                self.dragCellSnapshot?.center = (cell?.center)!
+//                self.dragCellSnapshot?.transform = CGAffineTransform.identity
+//                self.dragCellSnapshot?.alpha = 0.0
+//                cell?.alpha = 1.0
+//            }, completion: { (finished) -> Void in
+//                if finished {
+//                    self.dragInitialIndexPath = nil
+//                    self.dragCellSnapshot?.removeFromSuperview()
+//                    self.dragCellSnapshot = nil
+//
+//                    self.array[self.to].position = Int16(self.to)
+//                    self.array[self.from].position = Int16(self.from)
+//
+//                    print("from \(self.from)")
+//                    print("to \(self.to)")
+//
+//                    for item in self.array {
+//                        if (self.from < item.position) && (item.position < self.to) {
+//                            item.position -= 1
+//                        }
+//                    }
+//
+//                    self.save()
+//                }
+//            })
+//        }
+//    }
+//
+//    func snapshotOfCell(inputView: UIView) -> UIView {
+//        UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
+//        inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
+//        let image = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//
+//        let cellSnapshot = UIImageView(image: image)
+//        cellSnapshot.layer.masksToBounds = false
+//        cellSnapshot.layer.cornerRadius = 0.0
+//        cellSnapshot.layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
+//        cellSnapshot.layer.shadowRadius = 5.0
+//        cellSnapshot.layer.shadowOpacity = 0.4
+//        return cellSnapshot
+//    }
+//
+//}
 
 
 // This is we need to make it looks as a popup window on iPhone

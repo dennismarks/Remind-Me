@@ -16,7 +16,8 @@ class AddNewCategoryViewController: UIViewController {
     
     var num = 0
     var delegate : UpdateMainViewDelegate?
-
+    @IBOutlet weak var colourPickerView: UIPickerView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -24,7 +25,7 @@ class AddNewCategoryViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidDisappear(true)
         UIView.animate(withDuration: 0.5) {
-            self.preferredContentSize = CGSize(width: self.view.frame.width - 7, height: self.view.frame.width - 7)
+            self.preferredContentSize = CGSize(width: self.view.frame.width - 7, height: self.view.frame.height - 7)
         }
     }
     
@@ -33,22 +34,15 @@ class AddNewCategoryViewController: UIViewController {
         self.delegate?.addNewCategory()
     }
     
-    @IBAction func goBack(_ sender: UIButton) {
-        self.delegate?.addNewCategory()
+    @IBAction func dismissPressed(_ sender: UIButton) {
+//        self.delegate?.addNewCategory()
         self.dismiss(animated: true, completion: nil)
     }
+}
+
+
+extension AddNewCategoryViewController: UIPickerViewDelegate, UIPickerViewDelegate {
     
     
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
