@@ -85,7 +85,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
 //        cell.layer.borderColor = UIColor.blue.cgColor
 //        cell.layer.cornerRadius = 15
         cell.selectionStyle = .none
-        cell.backgroundColor = hexStringToUIColor(hex: colourArray[indexPath.row])
+//        cell.backgroundColor = hexStringToUIColor(hex: colourArray[indexPath.row])
+        cell.backgroundColor = hexStringToUIColor(hex: array[indexPath.row].colour!)
         return cell
     }
 
@@ -118,11 +119,26 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             popOverVC?.delegate = self
             popOverVC?.sourceView = self.addButton
             popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
-            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width - 3, height: self.view.frame.height - 3)
+            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
         }
     }
     
-    func addNewCategory() {
+    func addNewCategory(name: String, colour: String) {
+        UIView.animate(withDuration: 0.5) {
+            self.view.layer.opacity = 1.0
+        }
+        let category = Category(context: self.context)
+        category.name = name
+        category.position = Int16(self.curIndex)
+        category.colour = colour
+        self.curIndex += 1
+        self.array.append(category)
+        self.save()
+        self.tableView.reloadData()
+        print("Saved new category")
+    }
+    
+    func dismissView() {
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
