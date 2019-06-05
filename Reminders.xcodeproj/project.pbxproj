@@ -18,6 +18,7 @@
 		84389EDB229A34E600E0374E /* Reminders.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84389ED9229A34E600E0374E /* Reminders.xcdatamodeld */; };
 		84389EDD229A34E700E0374E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84389EDC229A34E700E0374E /* Assets.xcassets */; };
 		84389EE0229A34E700E0374E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84389EDE229A34E700E0374E /* LaunchScreen.storyboard */; };
+		845C755322ACC20100105819 /* AddNewCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845C755222ACC20100105819 /* AddNewCategoryViewController.swift */; };
 		84629DFF229CBAAC0054EB40 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84629DFE229CBAAC0054EB40 /* CategoryTableViewController.swift */; };
 		8490E896229B2B6E00655F75 /* CustomItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8490E894229B2B6E00655F75 /* CustomItemCell.swift */; };
 		8490E897229B2B6E00655F75 /* CustomItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8490E895229B2B6E00655F75 /* CustomItemCell.xib */; };
@@ -40,6 +41,7 @@
 		84389EDC229A34E700E0374E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84389EDF229A34E700E0374E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		84389EE1229A34E700E0374E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		845C755222ACC20100105819 /* AddNewCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewCategoryViewController.swift; sourceTree = "<group>"; };
 		84629DFE229CBAAC0054EB40 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		8490E894229B2B6E00655F75 /* CustomItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomItemCell.swift; sourceTree = "<group>"; };
 		8490E895229B2B6E00655F75 /* CustomItemCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomItemCell.xib; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 			isa = PBXGroup;
 			children = (
 				8411FF5822A9745B006FE580 /* ExpandingTableViewController.swift */,
+				845C755222ACC20100105819 /* AddNewCategoryViewController.swift */,
 				8411FF5E22A98AA9006FE580 /* ItemsViewController.swift */,
 				8411FF5A22A974CA006FE580 /* ExpandedViewController.swift */,
 				84629DFE229CBAAC0054EB40 /* CategoryTableViewController.swift */,
@@ -97,7 +100,6 @@
 			isa = PBXGroup;
 			children = (
 				8411FF5C22A974E0006FE580 /* ExpandAnimator.swift */,
-				84389ED2229A34E600E0374E /* AppDelegate.swift */,
 				84389EDC229A34E700E0374E /* Assets.xcassets */,
 			);
 			path = Other;
@@ -123,6 +125,7 @@
 		84389ED1229A34E600E0374E /* Reminders */ = {
 			isa = PBXGroup;
 			children = (
+				84389ED2229A34E600E0374E /* AppDelegate.swift */,
 				8411FF5222A96F8C006FE580 /* Model */,
 				8411FF5322A96FA9006FE580 /* View */,
 				8411FF5422A96FC1006FE580 /* Controller */,
@@ -207,6 +210,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8411FF5D22A974E0006FE580 /* ExpandAnimator.swift in Sources */,
+				845C755322ACC20100105819 /* AddNewCategoryViewController.swift in Sources */,
 				8411FF5B22A974CA006FE580 /* ExpandedViewController.swift in Sources */,
 				84389ED5229A34E600E0374E /* ItemTableViewController.swift in Sources */,
 				84BD8198229EBFAF0031330D /* AddNewItemViewController.swift in Sources */,

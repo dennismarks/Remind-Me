@@ -151,13 +151,13 @@
         <!--Expanding Table View Controller-->
         <scene sceneID="Whc-CU-uTq">
             <objects>
-                <viewController id="rO2-3b-T1g" customClass="ExpandingTableViewController" customModule="Reminders" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="mainVC" id="rO2-3b-T1g" customClass="ExpandingTableViewController" customModule="Reminders" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Fxp-43-zVP">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="LOy-sA-au4">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="3hH-bc-3Hd">
@@ -177,23 +177,45 @@
                                     <outlet property="delegate" destination="rO2-3b-T1g" id="pk2-eI-Y99"/>
                                 </connections>
                             </tableView>
+                            <view alpha="0.5" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uf4-M3-QPf">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="28"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <button opaque="NO" alpha="0.84999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pD9-5d-JL9">
+                                <rect key="frame" x="157.5" y="591" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="FOF-iu-9sC"/>
+                                    <constraint firstAttribute="width" constant="60" id="nZ8-In-DeA"/>
+                                </constraints>
+                                <state key="normal" image="add"/>
+                                <connections>
+                                    <action selector="addButtonPressed:" destination="rO2-3b-T1g" eventType="touchUpInside" id="1gc-ty-4gH"/>
+                                    <segue destination="pGD-k2-id8" kind="presentation" identifier="goToAddCategory" id="6Og-qV-xil"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="LOy-sA-au4" firstAttribute="top" secondItem="Nfq-k1-t5K" secondAttribute="top" id="6tK-be-xSt"/>
-                            <constraint firstItem="LOy-sA-au4" firstAttribute="leading" secondItem="Nfq-k1-t5K" secondAttribute="leading" id="MIe-wR-CXt"/>
-                            <constraint firstItem="LOy-sA-au4" firstAttribute="bottom" secondItem="Nfq-k1-t5K" secondAttribute="bottom" id="n0s-oa-0i0"/>
-                            <constraint firstItem="LOy-sA-au4" firstAttribute="trailing" secondItem="Nfq-k1-t5K" secondAttribute="trailing" id="xg6-Cg-jbt"/>
+                            <constraint firstItem="LOy-sA-au4" firstAttribute="top" secondItem="Fxp-43-zVP" secondAttribute="top" id="SFb-R5-CUQ"/>
+                            <constraint firstAttribute="bottom" secondItem="LOy-sA-au4" secondAttribute="bottom" id="aZh-4A-fRb"/>
+                            <constraint firstItem="pD9-5d-JL9" firstAttribute="centerX" secondItem="Fxp-43-zVP" secondAttribute="centerX" id="d6R-5e-kVp"/>
+                            <constraint firstItem="Nfq-k1-t5K" firstAttribute="bottom" secondItem="pD9-5d-JL9" secondAttribute="bottom" constant="16" id="nD6-W3-rC3"/>
+                            <constraint firstAttribute="trailing" secondItem="LOy-sA-au4" secondAttribute="trailing" id="rTq-rq-kRS"/>
+                            <constraint firstItem="LOy-sA-au4" firstAttribute="leading" secondItem="Fxp-43-zVP" secondAttribute="leading" id="vuP-r9-wEp"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Nfq-k1-t5K"/>
                     </view>
+                    <navigationItem key="navigationItem" id="JkS-wm-DZL"/>
                     <connections>
+                        <outlet property="addButton" destination="pD9-5d-JL9" id="ODa-Ib-arj"/>
+                        <outlet property="statusBarView" destination="Uf4-M3-QPf" id="ap7-hL-cqC"/>
                         <outlet property="tableView" destination="LOy-sA-au4" id="UKQ-AO-LNM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4hS-ci-nBi" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="477.60000000000002" y="937.78110944527748"/>
+            <point key="canvasLocation" x="1416.8" y="936.88155922038993"/>
         </scene>
         <!--Items View Controller-->
         <scene sceneID="jEs-jn-yHk">
@@ -222,18 +244,18 @@
                                     <outlet property="delegate" destination="vcb-A7-I0F" id="ty9-Jh-E8s"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LDr-bD-PBC">
-                                <rect key="frame" x="170.5" y="617" width="34" height="30"/>
-                                <state key="normal" title="Back"/>
-                                <connections>
-                                    <action selector="backButtonPressed:" destination="vcb-A7-I0F" eventType="touchUpInside" id="NPt-Db-OE1"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6JM-XZ-YLd">
                                 <rect key="frame" x="321" y="617" width="30" height="30"/>
                                 <state key="normal" title="Add"/>
                                 <connections>
                                     <action selector="addButtonPressed:" destination="vcb-A7-I0F" eventType="touchUpInside" id="pb4-SJ-iEx"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LDr-bD-PBC">
+                                <rect key="frame" x="170.5" y="617" width="34" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="backButtonPressed:" destination="vcb-A7-I0F" eventType="touchUpInside" id="NPt-Db-OE1"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -256,9 +278,40 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BgW-9M-Jha" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1296.8" y="937.78110944527748"/>
+            <point key="canvasLocation" x="2236" y="937.78110944527748"/>
+        </scene>
+        <!--Add New Category View Controller-->
+        <scene sceneID="cIh-aQ-GtZ">
+            <objects>
+                <viewController storyboardIdentifier="addCategory" id="pGD-k2-id8" customClass="AddNewCategoryViewController" customModule="Reminders" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Sr4-hE-nqP">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3vd-Ah-ovE">
+                                <rect key="frame" x="170.5" y="318.5" width="34" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="goBack:" destination="pGD-k2-id8" eventType="touchUpInside" id="x7s-Sl-aZl"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="3vd-Ah-ovE" firstAttribute="centerX" secondItem="Sr4-hE-nqP" secondAttribute="centerX" id="Qaf-pC-cFY"/>
+                            <constraint firstItem="3vd-Ah-ovE" firstAttribute="centerY" secondItem="Sr4-hE-nqP" secondAttribute="centerY" id="zoX-cn-Rrp"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="yJW-TE-yL4"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Pbw-gg-vyU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2236" y="1714"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="add" width="128" height="128"/>
+    </resources>
     <inferredMetricsTieBreakers>
         <segue reference="19X-d5-R76"/>
     </inferredMetricsTieBreakers>

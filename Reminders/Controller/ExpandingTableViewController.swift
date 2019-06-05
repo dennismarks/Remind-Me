@@ -11,9 +11,13 @@ import UIKit
 import CoreData
 
 
-class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIViewControllerTransitioningDelegate {
+class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIViewControllerTransitioningDelegate, UpdateMainViewDelegate {
     
+    @IBOutlet weak var statusBarView: UIView!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var addButton: UIButton!
+    
+    
     var array = [Category]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var dragInitialIndexPath: IndexPath?
@@ -31,12 +35,22 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGesture(sender:)))
         longPress.minimumPressDuration = 0.2 // optional
-        tableView.addGestureRecognizer(longPress)
+        self.tableView.addGestureRecognizer(longPress)
         
-        tableView.separatorStyle = .none
+        self.tableView.separatorStyle = .none
+        let window = UIApplication.shared.windows[0]
+        let safeFrame = window.safeAreaLayoutGuide.layoutFrame
+        statusBarView.frame.size.height = safeFrame.minY
+//        statusBarView.layer.cornerRadius = 12.0
         load()
+        self.view.layer.opacity = 1.0
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        self.view.layer.opacity = 1.0
+    }
+        
     var openingFrame: CGRect?
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -77,19 +91,11 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         let frameToOpenFrom = tableView.convert(attributesFrame!, to: tableView.superview)
         openingFrame = frameToOpenFrom
         
-        // Present View Controller
-//        let expandedVC = ItemsViewController()
-//        expandedVC.transitioningDelegate = self
-//        expandedVC.modalPresentationStyle = .custom
-//        expandedVC.view.backgroundColor = hexStringToUIColor(hex: colourArray[indexPath.row])
-//        expandedVC.selectedCategory = array[indexPath.row]
-//        present(expandedVC, animated: true, completion: nil)
-//        tableView.deselectRow(at: indexPath, animated: true)
         curRow = indexPath.row
         self.performSegue(withIdentifier: "goToItems", sender: self)
 
     }
-//
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToItems" {
             let destinationVC = segue.destination as! ItemsViewController
@@ -98,11 +104,58 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             destinationVC.selectedCategory = array[curRow]
             destinationVC.tableViewColour = colourArray[curRow]
         }
+        else if segue.identifier == "goToAddCategory" {
+            let destinationVC = segue.destination as! AddNewCategoryViewController
+            destinationVC.delegate = self
+            destinationVC.modalPresentationStyle = .popover
+            let popOverVC = destinationVC.popoverPresentationController
+            popOverVC?.delegate = self
+            popOverVC?.sourceView = self.addButton
+            popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
+            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width - 3, height: self.view.frame.width - 3)
+        }
+    }
+    
+    func addNewCategory() {
+        UIView.animate(withDuration: 1.0) {
+            self.view.layer.opacity = 1.0
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
+    
+    @IBAction func addButtonPressed(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.5) {
+            self.view.layer.opacity = 0.5
+        }
+        performSegue(withIdentifier: "goToAddCategory", sender: self)
+        
+//        var textField = UITextField()
+//        let alert = UIAlertController(title: "Add new category", message: .none, preferredStyle: .alert)
+//        let add = UIAlertAction(title: "Add category", style: .default) { (UIAlertAction) in
+//            if let text = textField.text {
+//                let category = Category(context: self.context)
+//                category.name = text
+//                category.position = Int16(self.curIndex)
+//                self.curIndex += 1
+//                self.array.append(category)
+//                self.save()
+//                self.tableView.reloadData()
+//                print("Saved new category")
+//            }
+//        }
+//        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
+//        alert.addTextField { (UITextField) in
+//            UITextField.placeholder = "Create new item"
+//            textField = UITextField
+//        }
+//        alert.addAction(add)
+//        alert.addAction(cancel)
+//        present(alert, animated: true)
+    }
+    
     
     func save() {
         do {
@@ -245,4 +298,13 @@ extension ExpandingTableViewController {
         return cellSnapshot
     }
     
+}
+
+
+// This is we need to make it looks as a popup window on iPhone
+extension ExpandingTableViewController: UIPopoverPresentationControllerDelegate {
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
+    }
 }
