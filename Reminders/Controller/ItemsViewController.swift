@@ -18,6 +18,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var addButton: UIButton!
+    @IBOutlet weak var bottomSafeView: UIView!
+    @IBOutlet weak var topSafeView: UIView!
+    @IBOutlet weak var tableViewFooter: UIView!
+    
     
     var selectedCategory : Category? {
         // what should happen when a variable gets set with a new value
@@ -35,6 +39,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
         itemTableView.separatorStyle = .none
+        
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
             UIView.animate(withDuration: 0.8, animations: {
                 self.backButton.layer.opacity = 0.85
@@ -43,13 +49,42 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         })
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+
+        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
+        topSafeView.translatesAutoresizingMaskIntoConstraints = false
+        let window = UIApplication.shared.windows[0]
+        let safeFrame = window.safeAreaLayoutGuide.layoutFrame
+        
+        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
+        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
+        topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY).isActive = true
+        topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
+        bottomSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+        tableViewFooter.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+        
+        itemTableView.estimatedRowHeight = 100
+        itemTableView.rowHeight = UITableView.automaticDimension
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let data = array[indexPath.row] as Item
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
         cell.titleLabel.textColor = .red
         cell.accessoryType = data.done ? .checkmark : .none
-        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.3) : UIColor.white
+        cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+//        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.3) : UIColor.white
         cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.red : UIColor.black
         
         if cell.accessoryType == .checkmark {
@@ -61,9 +96,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
-    }
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return UITableView.automaticDimension
+//    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return array.count
@@ -89,23 +124,22 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             completion(true)
         }
         //        deleteAction.image = UIImage(named: "delete")
-        //        deleteAction.backgroundColor = .white
+        deleteAction.backgroundColor = .black
         editAction.backgroundColor = .orange
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
     @IBAction func backButtonPressed(_ sender: UIButton) {
         print("Back pressed")
+        UIView.animate(withDuration: 0.065) {
+            self.addButton.layer.opacity = 0.0
+            self.backButton.layer.opacity = 0.0
+        }
         self.delegate?.updateUI()
         self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        let pvc = storyboard.instantiateViewController(withIdentifier: "AddNewItemViewController") as? AddNewItemViewController
-//        //        pvc!.modalPresentationStyle = .overCurrentContext
-//        self.present(pvc!, animated: true, completion: nil)
-        
         var textField = UITextField()
         let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
         let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in

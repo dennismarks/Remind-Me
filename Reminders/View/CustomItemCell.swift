@@ -22,6 +22,9 @@ class CustomItemCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+//        titleLabel.numberOfLines = 2
+//        titleLabel.adjustsFontSizeToFitWidth = true
+//        titleLabel.minimumScaleFactor = 0.2
     }
     
 //    override var frame: CGRect {

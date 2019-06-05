@@ -107,6 +107,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             destinationVC.modalPresentationStyle = .custom
             destinationVC.selectedCategory = array[curRow]
             destinationVC.tableViewColour = array[curRow].colour!
+//            destinationVC.tableViewColour = "#3D3D3D"
         }
         else if segue.identifier == "goToAddCategory" {
             let destinationVC = segue.destination as! AddNewCategoryViewController
