@@ -42,9 +42,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
-            UIView.animate(withDuration: 0.8, animations: {
-                self.backButton.layer.opacity = 0.85
-                self.addButton.layer.opacity = 0.85
+            UIView.animate(withDuration: 0.6, animations: {
+                self.backButton.layer.opacity = 0.92
+                self.addButton.layer.opacity = 0.92
             })
         })
     }
@@ -81,17 +81,34 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let data = array[indexPath.row] as Item
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
-        cell.titleLabel.textColor = .red
-        cell.accessoryType = data.done ? .checkmark : .none
+//        cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
-//        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.3) : UIColor.white
-        cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.red : UIColor.black
-        
-        if cell.accessoryType == .checkmark {
-            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: cell.titleLabel.text!)
-            attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributeString.length))
-            cell.textLabel?.attributedText = attributeString
+        cell.tintColor = .white
+        let doneImage = UIImage(named: "done.png")?.withRenderingMode(.alwaysTemplate)
+        let circleImage = UIImage(named: "circle.png")?.withRenderingMode(.alwaysTemplate)
+        if (data.done) {
+            cell.doneButton.setImage(doneImage, for: .normal)
+        } else {
+            cell.doneButton.setImage(circleImage, for: .normal)
         }
+        cell.doneButton.tintColor = .black
+//        cell.doneButton.layer.cornerRadius = 14.0
+//        cell.doneButton.layer.shadowColor = UIColor.black.cgColor
+//        cell.doneButton.layer.shadowRadius = 5.0
+//        cell.doneButton.layer.shadowOpacity = 0.1
+//        cell.doneButton.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+        
+    
+
+        
+//        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.3) : UIColor.white
+//        cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.red : UIColor.black
+        
+//        if cell.accessoryType == .checkmark {
+//            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: cell.titleLabel.text!)
+//            attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributeString.length))
+//            cell.textLabel?.attributedText = attributeString
+//        }
         
         return cell
     }

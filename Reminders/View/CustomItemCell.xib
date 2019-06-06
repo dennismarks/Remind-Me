@@ -19,13 +19,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pgq-vB-eml">
-                        <rect key="frame" x="28" y="12" width="264" height="37.5"/>
+                        <rect key="frame" x="28" y="12" width="242" height="37.5"/>
                         <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="20"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tomorrow 10:00 PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eR4-De-CfD">
-                        <rect key="frame" x="28" y="54.5" width="264" height="12"/>
+                        <rect key="frame" x="28" y="54.5" width="242" height="12"/>
                         <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="14"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -37,23 +37,36 @@
                             <constraint firstAttribute="height" constant="1" id="ZRS-lv-WTO"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2me-hp-OkO">
+                        <rect key="frame" x="279" y="27.5" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="pxV-ZF-g8F"/>
+                            <constraint firstAttribute="width" constant="25" id="s7g-xm-06p"/>
+                        </constraints>
+                        <connections>
+                            <action selector="doneButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="BuQ-CO-Ga4"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="Tj4-Hb-Pxh" secondAttribute="bottom" id="2iX-Xn-KIc"/>
                     <constraint firstAttribute="trailing" secondItem="Tj4-Hb-Pxh" secondAttribute="trailing" id="4IB-4V-jyV"/>
                     <constraint firstItem="pgq-vB-eml" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="12" id="6bJ-Wk-R1W"/>
                     <constraint firstItem="eR4-De-CfD" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="28" id="8D7-8S-tTp"/>
-                    <constraint firstAttribute="trailing" secondItem="eR4-De-CfD" secondAttribute="trailing" constant="28" id="BXr-fu-Cxu"/>
+                    <constraint firstAttribute="trailing" secondItem="eR4-De-CfD" secondAttribute="trailing" constant="50" id="BXr-fu-Cxu"/>
                     <constraint firstItem="Tj4-Hb-Pxh" firstAttribute="top" secondItem="eR4-De-CfD" secondAttribute="bottom" constant="12" id="Ib1-LB-EJR"/>
+                    <constraint firstAttribute="trailing" secondItem="2me-hp-OkO" secondAttribute="trailing" constant="16" id="KQU-ah-Jj3"/>
                     <constraint firstItem="Tj4-Hb-Pxh" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="LdJ-kF-8vv"/>
                     <constraint firstAttribute="bottom" secondItem="pgq-vB-eml" secondAttribute="bottom" constant="30" id="ZtI-jQ-h0R"/>
+                    <constraint firstItem="2me-hp-OkO" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="btv-Zw-aTh"/>
                     <constraint firstItem="pgq-vB-eml" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="28" id="cly-Rs-Fxm"/>
                     <constraint firstItem="eR4-De-CfD" firstAttribute="top" secondItem="pgq-vB-eml" secondAttribute="bottom" constant="5" id="ehG-Py-7bg"/>
-                    <constraint firstAttribute="trailing" secondItem="pgq-vB-eml" secondAttribute="trailing" constant="28" id="zLf-qr-11z"/>
+                    <constraint firstAttribute="trailing" secondItem="pgq-vB-eml" secondAttribute="trailing" constant="50" id="zLf-qr-11z"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="doneButton" destination="2me-hp-OkO" id="caD-BB-zxy"/>
                 <outlet property="titleLabel" destination="pgq-vB-eml" id="FeG-Sg-2es"/>
             </connections>
             <point key="canvasLocation" x="137.68115942028987" y="140.625"/>

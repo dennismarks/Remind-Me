@@ -12,6 +12,7 @@ class CustomItemCell: UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var view: UIView!
+    @IBOutlet weak var doneButton: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -20,12 +21,11 @@ class CustomItemCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-//        titleLabel.numberOfLines = 2
-//        titleLabel.adjustsFontSizeToFitWidth = true
-//        titleLabel.minimumScaleFactor = 0.2
     }
+    
+    @IBAction func doneButtonPressed(_ sender: UIButton) {
+    }
+    
     
 //    override var frame: CGRect {
 //        get {
