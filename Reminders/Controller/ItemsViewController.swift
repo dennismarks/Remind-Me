@@ -13,7 +13,7 @@ protocol UpdateUIAfterGoBackDelegate {
     func updateUI()
 }
 
-class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, DoneButtonPressedDelegate {
     
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
@@ -40,9 +40,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
         itemTableView.separatorStyle = .none
         
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
-            UIView.animate(withDuration: 0.6, animations: {
+            UIView.animate(withDuration: 0.4, animations: {
                 self.backButton.layer.opacity = 0.92
                 self.addButton.layer.opacity = 0.92
             })
@@ -81,6 +80,15 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let data = array[indexPath.row] as Item
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
+        cell.reminderLabel.text = data.reminder
+        if data.reminder == "" {
+            cell.topSpace.isActive = false
+            cell.bottomSpace.isActive = false
+            cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.trailingAnchor, constant: 28).isActive = true
+            cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
+            print(cell.titleLabel.constraints)
+        }
 //        cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         cell.tintColor = .white
@@ -92,6 +100,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             cell.doneButton.setImage(circleImage, for: .normal)
         }
         cell.doneButton.tintColor = .black
+        cell.delegate = self
 //        cell.doneButton.layer.cornerRadius = 14.0
 //        cell.doneButton.layer.shadowColor = UIColor.black.cgColor
 //        cell.doneButton.layer.shadowRadius = 5.0
@@ -122,10 +131,17 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        array[indexPath.row].done = !array[indexPath.row].done
+//        array[indexPath.row].done = !array[indexPath.row].done
+//        save()
+//        self.itemTableView.reloadData()
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func donePressed(cell: CustomItemCell) {
+        let indexPath = itemTableView.indexPath(for: cell)
+        array[indexPath!.row].done = !array[indexPath!.row].done
         save()
         self.itemTableView.reloadData()
-        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -157,28 +173,79 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
-        var textField = UITextField()
-        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
-        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
-            if let text = textField.text {
-                let item = Item(context: self.context)
-                item.title = text
-                item.done = false
-                item.parentCategory = self.selectedCategory
-                self.array.append(item)
-                self.save()
-                self.itemTableView.reloadData()
-                print("Saved")
-            }
+        UIView.animate(withDuration: 0.8) {
+            self.view.layer.opacity = 0.6
         }
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
-        alert.addTextField { (UITextField) in
-            UITextField.placeholder = "Create new item"
-            textField = UITextField
+        performSegue(withIdentifier: "goToAddItem", sender: self)
+        
+//        var textField = UITextField()
+//        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
+//        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
+//            if let text = textField.text {
+//                let item = Item(context: self.context)
+//                item.title = text
+//                item.done = false
+//                item.parentCategory = self.selectedCategory
+//                self.array.append(item)
+//                self.save()
+//                self.itemTableView.reloadData()
+//                print("Saved")
+//            }
+//        }
+//        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
+//        alert.addTextField { (UITextField) in
+//            UITextField.placeholder = "Create new item"
+//            textField = UITextField
+//        }
+//        alert.addAction(add)
+//        alert.addAction(cancel)
+//        present(alert, animated: true)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goToAddItem" {
+            let destinationVC = segue.destination as! AddNewItemViewController
+            destinationVC.delegate = self
+            destinationVC.modalPresentationStyle = .popover
+            let popOverVC = destinationVC.popoverPresentationController
+            popOverVC?.delegate = self
+            popOverVC?.sourceView = self.addButton
+            popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
+            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
         }
-        alert.addAction(add)
-        alert.addAction(cancel)
-        present(alert, animated: true)
+    }
+    
+    func addNewItem(name: String) {
+        let item = Item(context: self.context)
+        item.title = name
+        item.reminder = ""
+        item.done = false
+        item.parentCategory = self.selectedCategory
+        self.array.append(item)
+        self.save()
+        self.itemTableView.reloadData()
+        print("Saved")
+    }
+    
+    func addNewItem(name: String, reminder: UIDatePicker) {
+        let formatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("EEE, MMM d hh:mm aaa")
+        let time = formatter.string(from: reminder.date)
+        print(time)
+        let item = Item(context: self.context)
+        item.title = name
+        item.reminder = time
+        item.done = false
+        item.parentCategory = self.selectedCategory
+        self.array.append(item)
+        self.save()
+        self.itemTableView.reloadData()
+    }
+    
+    func dismissView() {
+        UIView.animate(withDuration: 0.5) {
+            self.view.layer.opacity = 1.0
+        }
     }
     
     func save() {
@@ -233,4 +300,13 @@ extension ItemsViewController {
         )
     }
     
+}
+
+
+// This is we need to make it looks as a popup window on iPhone
+extension ItemsViewController: UIPopoverPresentationControllerDelegate {
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
+    }
 }
