@@ -10,6 +10,7 @@ import UIKit
 
 protocol AddNewItemDelegate {
     func addNewItem(name: String)
+    func addNewItem(name: String, reminder: UIDatePicker)
     func dismissView()
 }
 
@@ -21,10 +22,9 @@ class AddNewItemViewController: UIViewController {
     @IBOutlet weak var addReminderButton: UIButton!
     @IBOutlet weak var datePickerView: UIDatePicker!
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+//        Date().localizedDescription
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -38,10 +38,37 @@ class AddNewItemViewController: UIViewController {
     }
     
     @IBAction func addNewCategoryPressed(_ sender: UIButton) {
-        if let name = itemNameTextField.text {
+        guard let name = itemNameTextField.text else {
+            print("Name is empty")
+            return
+        }
+        if name == "" {
+            print("Name is empty")
+        } else if (active == false) {
             self.delegate?.addNewItem(name: name)
+        } else if (active == true) {
+            self.delegate?.addNewItem(name: name, reminder: datePickerView)
         }
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    func getDateStamp(date:String)-> String{
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss +SSSS"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        
+        guard let date = dateFormatter.date(from: date) else {
+            //  assert(false, "no date from string")
+            return ""
+        }
+        
+        dateFormatter.dateFormat = "dd MMMM,yyyy" //"yyyy-MM-dd"
+        dateFormatter.timeZone = TimeZone.current
+        
+        let st = dateFormatter.string(from: date)
+        
+        return st
     }
     
     @IBAction func addReminderPressed(_ sender: UIButton) {
