@@ -9,7 +9,7 @@
 
 import UIKit
 import CoreData
-
+import UserNotifications
 
 class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIViewControllerTransitioningDelegate, UpdateMainViewDelegate, UpdateUIAfterGoBackDelegate {
     
@@ -17,10 +17,12 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIButton!
     
-    var array = [Category]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var dragInitialIndexPath: IndexPath?
     var dragCellSnapshot: UIView?
+    var hideCellAllowed: Bool!
+    
+    var array = [Category]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     var curIndex = 0
     var from = 0
@@ -32,9 +34,36 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGesture(sender:)))
-//        longPress.minimumPressDuration = 0.2 // optional
-//        self.tableView.addGestureRecognizer(longPress)
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (didAllow, error) in }
+        
+        // first, you declare the content of the notification:
+        let content = UNMutableNotificationContent()
+        content.title = "Notification Title"
+        content.subtitle = "Notification Subtitle"
+        content.body = "Notification Body"
+        
+        // now, you should declare the UNCalendarNotificationTrigger instance,
+        // but before that, you'd need to describe what's the date matching for firing it:
+        
+        // for instance, this means it should get fired every Monday, at 10:30:
+        var date = DateComponents()
+        date.hour = 23
+        date.minute = 59
+        
+        // declaring the trigger
+        let calendarTrigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: true)
+        
+        // creating a request and add it to the notification center
+        let request = UNNotificationRequest(identifier: "notification-identifier", content: content, trigger: calendarTrigger)
+        UNUserNotificationCenter.current().add(request)
+        
+        
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
+        longPress.minimumPressDuration = 0.3 // optional
+        tableView.addGestureRecognizer(longPress)
+        
+        
         
         self.tableView.separatorStyle = .none
         let window = UIApplication.shared.windows[0]
@@ -96,6 +125,11 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         UIView.animate(withDuration: 0.065) {
             self.addButton.layer.opacity = 0.0
         }
+        
+        UIView.animate(withDuration: 1) {
+            self.view.layer.opacity = 0.0
+        }
+        
         self.performSegue(withIdentifier: "goToItems", sender: self)
     }
 
@@ -144,6 +178,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func updateUI() {
+        self.view.layer.opacity = 1.0
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: {
             UIView.animate(withDuration: 1, animations: {
                 self.addButton.layer.opacity = 0.85
@@ -160,29 +195,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             self.view.layer.opacity = 0.6
         }
         performSegue(withIdentifier: "goToAddCategory", sender: self)
-        
-//        var textField = UITextField()
-//        let alert = UIAlertController(title: "Add new category", message: .none, preferredStyle: .alert)
-//        let add = UIAlertAction(title: "Add category", style: .default) { (UIAlertAction) in
-//            if let text = textField.text {
-//                let category = Category(context: self.context)
-//                category.name = text
-//                category.position = Int16(self.curIndex)
-//                self.curIndex += 1
-//                self.array.append(category)
-//                self.save()
-//                self.tableView.reloadData()
-//                print("Saved new category")
-//            }
-//        }
-//        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
-//        alert.addTextField { (UITextField) in
-//            UITextField.placeholder = "Create new item"
-//            textField = UITextField
-//        }
-//        alert.addAction(add)
-//        alert.addAction(cancel)
-//        present(alert, animated: true)
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -224,6 +236,110 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         } catch {
             print("Error fetchin data from context \(error)")
         }
+    }
+    
+    @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
+        
+        let longPress = gestureRecognizer as! UILongPressGestureRecognizer
+        let state = longPress.state
+        let locationInView = longPress.location(in: tableView)
+        let indexPath = tableView.indexPathForRow(at: locationInView)
+        struct My {
+            static var cellSnapshot : UIView? = nil
+            static var cellIsAnimating : Bool = false
+            static var cellNeedToShow : Bool = false
+        }
+        struct Path {
+            static var initialIndexPath : IndexPath? = nil
+        }
+        switch state {
+        case UIGestureRecognizerState.began:
+            if indexPath != nil {
+                Path.initialIndexPath = indexPath
+                let cell = tableView.cellForRow(at: indexPath!) as! CustomCategoryCell?
+                My.cellSnapshot  = snapshotOfCell(cell!)
+                var center = cell?.center
+                My.cellSnapshot!.center = center!
+                My.cellSnapshot!.alpha = 0.0
+                tableView.addSubview(My.cellSnapshot!)
+                UIView.animate(withDuration: 0.25, animations: { () -> Void in
+                    center?.y = locationInView.y
+                    My.cellIsAnimating = true
+                    My.cellSnapshot!.center = center!
+                    My.cellSnapshot!.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+                    My.cellSnapshot!.alpha = 0.98
+                    cell?.alpha = 0.0
+                }, completion: { (finished) -> Void in
+                    if finished {
+                        My.cellIsAnimating = false
+                        if My.cellNeedToShow {
+                            My.cellNeedToShow = false
+                            UIView.animate(withDuration: 0.25, animations: { () -> Void in
+                                cell?.alpha = 1
+                            })
+                        } else {
+                            cell?.isHidden = true
+                        }
+                    }
+                })
+            }
+        case UIGestureRecognizerState.changed:
+            if My.cellSnapshot != nil {
+                var center = My.cellSnapshot!.center
+                center.y = locationInView.y
+                My.cellSnapshot!.center = center
+                if ((indexPath != nil) && (indexPath != Path.initialIndexPath)) {
+                    array.insert(array.remove(at: Path.initialIndexPath!.row), at: indexPath!.row)
+                    tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
+                    Path.initialIndexPath = indexPath
+                }
+            }
+        default:
+            if Path.initialIndexPath != nil {
+                let cell = tableView.cellForRow(at: Path.initialIndexPath!) as! CustomCategoryCell?
+                if My.cellIsAnimating {
+                    My.cellNeedToShow = true
+                } else {
+                    cell?.isHidden = false
+                    cell?.alpha = 0.0
+                }
+                UIView.animate(withDuration: 0.25, animations: { () -> Void in
+                    My.cellSnapshot!.center = (cell?.center)!
+                    My.cellSnapshot!.transform = CGAffineTransform.identity
+                    My.cellSnapshot!.alpha = 0.0
+                    cell?.alpha = 1.0
+                }, completion: { (finished) -> Void in
+                    if finished {
+                        Path.initialIndexPath = nil
+                        My.cellSnapshot!.removeFromSuperview()
+                        My.cellSnapshot = nil
+                    }
+                })
+            }
+        }
+
+    }
+    
+    func snapshotOfCell(_ inputView: UIView) -> UIView {
+        UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
+        inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()! as UIImage
+        UIGraphicsEndImageContext()
+        let cellSnapshot : UIView = UIImageView(image: image)
+        cellSnapshot.layer.masksToBounds = false
+        cellSnapshot.layer.cornerRadius = 0.0
+        cellSnapshot.layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
+        cellSnapshot.layer.shadowRadius = 5.0
+        cellSnapshot.layer.shadowOpacity = 0.4
+        return cellSnapshot
+    }
+    
+    struct My {
+        static var cellSnapShot: UIView? = nil
+    }
+    
+    struct Path {
+        static var initialIndexPath: IndexPath? = nil
     }
     
 }
@@ -364,13 +480,3 @@ extension ExpandingTableViewController: UIPopoverPresentationControllerDelegate 
         return .none
     }
 }
-
-//
-//extension ExpandingTableViewController:  {
-//
-//    func updateUI() {
-//        print("Here2")
-//        addButton.isHidden = false
-//    }
-//
-//}
