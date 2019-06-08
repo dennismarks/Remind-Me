@@ -47,10 +47,21 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 if self.array.count == 0 {
                     self.addSomeRemindersLabel.layer.opacity = 1.0
                 }
-                self.backButton.layer.opacity = 0.92
-                self.addButton.layer.opacity = 0.92
+                self.backButton.layer.opacity = 1.0
+                self.addButton.layer.opacity = 1.0
             })
         })
+        
+        let origImage = UIImage(named: "back")
+        let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
+        backButton.setImage(tintedImage, for: .normal)
+        backButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+        
+        let origImageAdd = UIImage(named: "add")
+        let tintedImageAdd = origImageAdd?.withRenderingMode(.alwaysTemplate)
+        addButton.setImage(tintedImageAdd, for: .normal)
+        addButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+        
         
 //        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapped))
 //        singleTapGesture.numberOfTapsRequired = 1
@@ -163,6 +174,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         cell.tintColor = .white
+        cell.titleLabel.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+        cell.reminderLabel.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         let doneImage = UIImage(named: "done.png")?.withRenderingMode(.alwaysTemplate)
         let circleImage = UIImage(named: "circle.png")?.withRenderingMode(.alwaysTemplate)
         if (data.done) {
@@ -170,7 +183,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         } else {
             cell.doneButton.setImage(circleImage, for: .normal)
         }
-        cell.doneButton.tintColor = .black
+        cell.doneButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+        cell.separationLine.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         cell.delegate = self
 //        cell.doneButton.layer.cornerRadius = 14.0
 //        cell.doneButton.layer.shadowColor = UIColor.black.cgColor
@@ -241,7 +255,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
+        let deleteAction = UIContextualAction(style: .destructive, title: .none) { (action, view, completion) in
             self.context.delete(self.array[indexPath.row])
             self.array.remove(at: indexPath.row)
             self.itemTableView.deleteRows(at: [indexPath], with: .automatic)
@@ -257,8 +271,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //            //            self.save()
 //            completion(true)
 //        }
-        //        deleteAction.image = UIImage(named: "delete")
-        deleteAction.backgroundColor = .black
+        deleteAction.image = UIImage(named: "delete")
+        deleteAction.backgroundColor = hexStringToUIColor(hex: "#DE615F")
+        
 //        editAction.backgroundColor = .orange
         return UISwipeActionsConfiguration(actions: [deleteAction])
     }
