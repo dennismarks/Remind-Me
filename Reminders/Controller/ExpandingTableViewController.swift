@@ -13,9 +13,10 @@ import UserNotifications
 
 class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIViewControllerTransitioningDelegate, UpdateMainViewDelegate, UpdateUIAfterGoBackDelegate {
     
-    @IBOutlet weak var statusBarView: UIView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIButton!
+//    @IBOutlet weak var topSafeView: UIView!
+//    @IBOutlet weak var bottomSafeView: UIView!
     
     var dragInitialIndexPath: IndexPath?
     var dragCellSnapshot: UIView?
@@ -36,40 +37,11 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (didAllow, error) in }
         
-        // first, you declare the content of the notification:
-        let content = UNMutableNotificationContent()
-        content.title = "Notification Title"
-        content.subtitle = "Notification Subtitle"
-        content.body = "Notification Body"
-        
-        // now, you should declare the UNCalendarNotificationTrigger instance,
-        // but before that, you'd need to describe what's the date matching for firing it:
-        
-        // for instance, this means it should get fired every Monday, at 10:30:
-        var date = DateComponents()
-        date.hour = 23
-        date.minute = 59
-        
-        // declaring the trigger
-        let calendarTrigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: true)
-        
-        // creating a request and add it to the notification center
-        let request = UNNotificationRequest(identifier: "notification-identifier", content: content, trigger: calendarTrigger)
-        UNUserNotificationCenter.current().add(request)
-        
-        
-        
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
         longPress.minimumPressDuration = 0.3 // optional
         tableView.addGestureRecognizer(longPress)
         
-        
-        
         self.tableView.separatorStyle = .none
-        let window = UIApplication.shared.windows[0]
-        let safeFrame = window.safeAreaLayoutGuide.layoutFrame
-        statusBarView.frame.size.height = safeFrame.minY
-//        statusBarView.layer.cornerRadius = 12.0
         load()
         curIndex = self.array.count
         print(curIndex)
@@ -78,6 +50,62 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         for item in array {
             print(item.name!, item.position)
         }
+        
+//        // Find size for blur effect.
+//        let statusBarHeight = UIApplication.shared.statusBarFrame.size.height
+//        let bounds = self.navigationController?.navigationBar.bounds.insetBy(dx: 0, dy: -(statusBarHeight)).offsetBy(dx: 0, dy: -(statusBarHeight))
+//        // Create blur effect.
+//        let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//        visualEffectView.frame = bounds!
+//        // Set navigation bar up.
+//        self.navigationController?.navigationBar.isTranslucent = true
+//        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+//        self.navigationController?.navigationBar.addSubview(visualEffectView)
+//        self.navigationController?.navigationBar.sendSubviewToBack(visualEffectView)
+        
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        let topSafeView = UIView()
+        let bottomSafeView = UIView()
+        
+        self.view.addSubview(topSafeView)
+        self.view.addSubview(bottomSafeView)
+
+        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
+        topSafeView.translatesAutoresizingMaskIntoConstraints = false
+        let window = UIApplication.shared.windows[0]
+        let safeFrame = window.safeAreaLayoutGuide.layoutFrame
+        
+        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
+        bottomSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        bottomSafeView.frame.size.height = window.frame.maxY - safeFrame.maxY
+        bottomSafeView.frame.size.width = view.frame.width
+        
+        topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY).isActive = true
+        topSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+        topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        topSafeView.frame.size.height = safeFrame.minY
+        topSafeView.frame.size.width = view.frame.width
+        
+        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectViewTop.frame = topSafeView.bounds
+
+        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectViewBot.frame = bottomSafeView.bounds
+        
+        topSafeView.addSubview(visualEffectViewTop)
+        bottomSafeView.addSubview(visualEffectViewBot)
     }
     
     var openingFrame: CGRect?
