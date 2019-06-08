@@ -8,12 +8,14 @@
 
 import UIKit
 import CoreData
+import UserNotifications
+
 
 protocol UpdateUIAfterGoBackDelegate {
     func updateUI()
 }
 
-class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, DoneButtonPressedDelegate {
+class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, DoneButtonPressedDelegate, UIGestureRecognizerDelegate {
     
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
@@ -21,7 +23,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var bottomSafeView: UIView!
     @IBOutlet weak var topSafeView: UIView!
     @IBOutlet weak var tableViewFooter: UIView!
-    
+    @IBOutlet weak var addSomeRemindersLabel: UILabel!
     
     var selectedCategory : Category? {
         // what should happen when a variable gets set with a new value
@@ -42,15 +44,74 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
             UIView.animate(withDuration: 0.4, animations: {
+                if self.array.count == 0 {
+                    self.addSomeRemindersLabel.layer.opacity = 1.0
+                }
                 self.backButton.layer.opacity = 0.92
                 self.addButton.layer.opacity = 0.92
             })
         })
+        
+//        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapped))
+//        singleTapGesture.numberOfTapsRequired = 1
+//        view.addGestureRecognizer(singleTapGesture)
+//        
+//        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
+//        doubleTapGesture.numberOfTapsRequired = 2
+//        doubleTapGesture.delegate = self
+//        view.addGestureRecognizer(doubleTapGesture)
+//
+//        singleTapGesture.require(toFail: doubleTapGesture)
     }
+    
+//    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+//        if touch.view is UIButton {
+//            return false
+//        }
+//        return true
+//    }
+    
+//    func handlePanGesture(panGesture: UIPanGestureRecognizer) {
+//
+//        let percent = max(panGesture.translation(in: view).x, 0) / view.frame.width
+//
+//        switch panGesture.state {
+//
+//        case .began:
+//            navigationController?.delegate = self
+//            navigationController?.popViewControllerAnimated(true)
+//
+//        case .Changed:
+//            percentDrivenInteractiveTransition.updateInteractiveTransition(percent)
+//
+//        case .Ended:
+//            let velocity = panGesture.velocityInView(view).x
+//
+//            // Continue if drag more than 50% of screen width or velocity is higher than 1000
+//            if percent > 0.5 || velocity > 1000 {
+//                percentDrivenInteractiveTransition.finishInteractiveTransition()
+//            } else {
+//                percentDrivenInteractiveTransition.cancelInteractiveTransition()
+//            }
+//
+//        case .Cancelled, .Failed:
+//            percentDrivenInteractiveTransition.cancelInteractiveTransition()
+//
+//        default:
+//            break
+//        }
+//    }
+    
+
+//    override var prefersStatusBarHidden: Bool {
+//        return true
+//    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-
+        
+//        UIApplication.shared.isStatusBarHidden = true
+        
         bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
         topSafeView.translatesAutoresizingMaskIntoConstraints = false
         let window = UIApplication.shared.windows[0]
@@ -74,7 +135,17 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         itemTableView.estimatedRowHeight = 100
         itemTableView.rowHeight = UITableView.automaticDimension
+        
     }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(true)
+//        UIApplication.shared.isStatusBarHidden = false
+//        var prefersStatusBarHidden: Bool {
+//            return false
+//        }
+//    }
+    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let data = array[indexPath.row] as Item
@@ -131,11 +202,36 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        array[indexPath.row].done = !array[indexPath.row].done
-//        save()
-//        self.itemTableView.reloadData()
+//        guard let destinationVC = storyboard?.instantiateViewController(withIdentifier: "ItemSettingsViewController") as? ItemSettingsViewController else { return }
+//        let transition = CATransition()
+//        transition.duration = 0.5
+//        transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+//        transition.type = CATransitionType.fade
+//        view.window!.layer.add(transition, forKey: kCATransition)
+//        present(destinationVC, animated: false, completion: nil)
+        print("Here")
+        
+//        DispatchQueue.main.async {
+//            array[indexPath.row].title.becomeFirstResponder()
+//        }
+        
+//        let cell = tableView.cellForRow(at: indexPath) as? CustomItemCell
+//        if cell!.isKind(of: CustomItemCell.self) {
+//            if let yourCell = cell as? CustomItemCell{
+//                yourCell.titleLabel.becomeFirstResponder()
+//            }
+//        }
+        
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        if cell.isKind(of: CustomItemCell.self) {
+//            if let yourCell = cell as? CustomItemCell{
+//                yourCell.titleLabel.becomeFirstResponder()
+//            }
+//        }
+//    }
     
     func donePressed(cell: CustomItemCell) {
         let indexPath = itemTableView.indexPath(for: cell)
@@ -149,17 +245,30 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.context.delete(self.array[indexPath.row])
             self.array.remove(at: indexPath.row)
             self.itemTableView.deleteRows(at: [indexPath], with: .automatic)
+            if self.array.count == 0 {
+                UIView.animate(withDuration: 0.5) {
+                    self.addSomeRemindersLabel.layer.opacity = 1.0
+                }
+            }
             self.save()
             completion(true)
         }
-        let editAction = UIContextualAction(style: .normal, title: "Edit") { (action, view, completion) in
-            //            self.save()
-            completion(true)
-        }
+//        let editAction = UIContextualAction(style: .normal, title: "Edit") { (action, view, completion) in
+//            //            self.save()
+//            completion(true)
+//        }
         //        deleteAction.image = UIImage(named: "delete")
         deleteAction.backgroundColor = .black
-        editAction.backgroundColor = .orange
-        return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
+//        editAction.backgroundColor = .orange
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    @objc func singleTapped() {
+        backButtonPressed(self.backButton)
+    }
+    
+    @objc func doubleTapped() {
+        addButtonPressed(self.addButton)
     }
     
     @IBAction func backButtonPressed(_ sender: UIButton) {
@@ -224,6 +333,11 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.array.append(item)
         self.save()
         self.itemTableView.reloadData()
+        if array.count > 0 {
+            UIView.animate(withDuration: 0.5) {
+                self.addSomeRemindersLabel.layer.opacity = 0
+            }
+        }
         print("Saved")
     }
     
@@ -238,8 +352,30 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         item.done = false
         item.parentCategory = self.selectedCategory
         self.array.append(item)
+        
+        
+        // declare the content of the notification:
+        let content = UNMutableNotificationContent()
+        content.title = selectedCategory!.name!
+//        content.subtitle = "Notification Subtitle"
+        content.body = item.title!
+        
+        // declaring the trigger
+        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.date)
+        let calendarTrigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+
+        // creating a request and add it to the notification center
+        let request = UNNotificationRequest(identifier: "notification-identifier", content: content, trigger: calendarTrigger)
+        UNUserNotificationCenter.current().add(request)
+        
+        if array.count > 0 {
+            UIView.animate(withDuration: 0.5) {
+                self.addSomeRemindersLabel.layer.opacity = 0
+            }
+        }
         self.save()
         self.itemTableView.reloadData()
+        
     }
     
     func dismissView() {
