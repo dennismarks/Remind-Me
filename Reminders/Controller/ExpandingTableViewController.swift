@@ -107,6 +107,11 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         
         topSafeView.addSubview(visualEffectViewTop)
         bottomSafeView.addSubview(visualEffectViewBot)
+        
+        let origImage = UIImage(named: "add")
+        let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
+        addButton.setImage(tintedImage, for: .normal)
+        addButton.tintColor = .black
     }
     
     var openingFrame: CGRect?
@@ -296,6 +301,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         switch state {
         case UIGestureRecognizerState.began:
             if indexPath != nil {
+                from = (indexPath?.row)!
+                print(from)
                 Path.initialIndexPath = indexPath
                 let cell = tableView.cellForRow(at: indexPath!) as! CustomCategoryCell?
                 My.cellSnapshot  = snapshotOfCell(cell!)
@@ -330,6 +337,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
                 center.y = locationInView.y
                 My.cellSnapshot!.center = center
                 if ((indexPath != nil) && (indexPath != Path.initialIndexPath)) {
+                    to = (indexPath?.row)!
+                    print(to)
                     array.insert(array.remove(at: Path.initialIndexPath!.row), at: indexPath!.row)
                     tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
                     Path.initialIndexPath = indexPath
@@ -356,6 +365,12 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
                         My.cellSnapshot = nil
                     }
                 })
+                
+                for i in 0...array.count-1 {
+                    array[i].position = Int16(i)
+                }
+                
+                save()
             }
         }
 
