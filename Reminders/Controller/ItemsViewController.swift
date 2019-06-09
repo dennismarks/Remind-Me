@@ -37,6 +37,11 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var array = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
+    var curIndex = 0
+    var from = 0
+    var to = 0
+    var curRow = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
@@ -298,6 +303,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: .none) { (action, view, completion) in
+            let index = indexPath.row
             self.context.delete(self.array[indexPath.row])
             self.array.remove(at: indexPath.row)
             self.itemTableView.deleteRows(at: [indexPath], with: .automatic)
@@ -306,6 +312,15 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     self.addSomeRemindersLabel.layer.opacity = 1.0
                 }
             }
+            
+            for item in self.array {
+                if index < item.position {
+                    item.position -= 1
+                }
+            }
+            
+            self.curIndex -= 1
+            
             self.save()
             completion(true)
         }
@@ -387,6 +402,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         item.reminder = ""
         item.done = false
         item.parentCategory = self.selectedCategory
+        item.position = Int16(self.curIndex)
         self.array.append(item)
         self.save()
         self.itemTableView.reloadData()

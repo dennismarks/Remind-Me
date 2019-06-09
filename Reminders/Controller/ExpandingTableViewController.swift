@@ -30,7 +30,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     var to = 0
     var curRow = 0
     
-    var colourArray = ["#E2C7C0", "#ECDBD8", "#71768A", "#303747", "#191F2F", "#0D1319"]
+//    var colourArray = ["#E2C7C0", "#ECDBD8", "#71768A", "#303747", "#191F2F", "#0D1319"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +44,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         self.tableView.separatorStyle = .none
         load()
         curIndex = self.array.count
-        print(curIndex)
+        print("Current index -> \(curIndex)")
         self.view.layer.opacity = 1.0
         
         for item in array {
@@ -65,6 +65,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         
         
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
@@ -98,10 +99,10 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         topSafeView.frame.size.height = safeFrame.minY
         topSafeView.frame.size.width = view.frame.width
         
-        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         visualEffectViewTop.frame = topSafeView.bounds
 
-        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         visualEffectViewBot.frame = bottomSafeView.bounds
         
         topSafeView.addSubview(visualEffectViewTop)
@@ -138,6 +139,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         cell.selectionStyle = .none
 //        cell.backgroundColor = hexStringToUIColor(hex: colourArray[indexPath.row])
         cell.backgroundColor = hexStringToUIColor(hex: array[indexPath.row].colour!)
+        cell.nameLabel.textColor = hexStringToUIColor(hex: array[indexPath.row].tintColour!)
         return cell
     }
 
@@ -183,7 +185,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    func addNewCategory(name: String, colour: String) {
+    func addNewCategory(name: String, colour: String, tint: String) {
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
@@ -191,6 +193,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         category.name = name
         category.position = Int16(self.curIndex)
         category.colour = colour
+        category.tintColour = tint
         self.curIndex += 1
         self.array.append(category)
         self.save()
@@ -227,9 +230,19 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
+            let index = indexPath.row
             self.context.delete(self.array[indexPath.row])
             self.array.remove(at: indexPath.row)
             self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            
+            for item in self.array {
+                if index < item.position {
+                    item.position -= 1
+                }
+            }
+            
+            self.curIndex -= 1
+            
             self.save()
             completion(true)
         }
