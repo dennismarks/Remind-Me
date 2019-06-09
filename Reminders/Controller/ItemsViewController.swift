@@ -20,8 +20,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var addButton: UIButton!
-    @IBOutlet weak var bottomSafeView: UIView!
-    @IBOutlet weak var topSafeView: UIView!
+//    @IBOutlet weak var bottomSafeView: UIView!
+//    @IBOutlet weak var topSafeView: UIView!
     @IBOutlet weak var tableViewFooter: UIView!
     @IBOutlet weak var addSomeRemindersLabel: UILabel!
     
@@ -123,25 +123,68 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
 //        UIApplication.shared.isStatusBarHidden = true
         
-        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
+        let topSafeView = UIView()
+//        let bottomSafeView = UIView()
+        
+        self.view.addSubview(topSafeView)
+//        self.view.addSubview(bottomSafeView)
+        
+//        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
         topSafeView.translatesAutoresizingMaskIntoConstraints = false
         let window = UIApplication.shared.windows[0]
         let safeFrame = window.safeAreaLayoutGuide.layoutFrame
         
-        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
-        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
-        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+//        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+//        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+//        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
+//        bottomSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+//        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//        bottomSafeView.frame.size.height = window.frame.maxY - safeFrame.maxY
+//        bottomSafeView.frame.size.width = view.frame.width
         
         topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
         topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
         topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
         topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY).isActive = true
+        topSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
         topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        topSafeView.frame.size.height = safeFrame.minY
+        topSafeView.frame.size.width = view.frame.width
         
-        bottomSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
-        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+        visualEffectViewTop.frame = topSafeView.bounds
+        
+//        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//        visualEffectViewBot.frame = bottomSafeView.bounds
+        
+        topSafeView.addSubview(visualEffectViewTop)
+//        bottomSafeView.addSubview(visualEffectViewBot)
+        
+//        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+        
+        
+        
+        
+//        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
+//        topSafeView.translatesAutoresizingMaskIntoConstraints = false
+//        let window = UIApplication.shared.windows[0]
+//        let safeFrame = window.safeAreaLayoutGuide.layoutFrame
+        
+//        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+//        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+//        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+//        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
+//        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//
+//        topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+//        topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+//        topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+//        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY).isActive = true
+//        topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//
+//        bottomSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
+//        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         tableViewFooter.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         
         itemTableView.estimatedRowHeight = 100
