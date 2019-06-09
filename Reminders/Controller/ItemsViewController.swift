@@ -15,7 +15,7 @@ protocol UpdateUIAfterGoBackDelegate {
     func updateUI()
 }
 
-class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, DoneButtonPressedDelegate, UIGestureRecognizerDelegate {
+class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, UIGestureRecognizerDelegate {
     
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
@@ -210,7 +210,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             cell.topSpace.isActive = false
             cell.bottomSpace.isActive = false
             cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.trailingAnchor, constant: 28).isActive = true
+            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.leadingAnchor, constant: 28).isActive = true
+            cell.titleLabel.trailingAnchor.constraint(equalTo: cell.cellContentView.trailingAnchor, constant: 28).isActive = true
             cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
             print(cell.titleLabel.constraints)
         }
@@ -219,16 +220,17 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         cell.tintColor = .white
         cell.titleLabel.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         cell.reminderLabel.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
-        let doneImage = UIImage(named: "done.png")?.withRenderingMode(.alwaysTemplate)
-        let circleImage = UIImage(named: "circle.png")?.withRenderingMode(.alwaysTemplate)
+//        let doneImage = UIImage(named: "done.png")?.withRenderingMode(.alwaysTemplate)
+////        let circleImage = UIImage(named: "circle.png")?.withRenderingMode(.alwaysTemplate)
         if (data.done) {
-            cell.doneButton.setImage(doneImage, for: .normal)
-        } else {
-            cell.doneButton.setImage(circleImage, for: .normal)
+            cell.titleLabel.layer.opacity = 0.4
+            cell.reminderLabel.layer.opacity = 0.4
         }
-        cell.doneButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+//        else {
+//            cell.doneButton.setImage(circleImage, for: .normal)
+//        }
+//        cell.doneButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         cell.separationLine.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
-        cell.delegate = self
 //        cell.doneButton.layer.cornerRadius = 14.0
 //        cell.doneButton.layer.shadowColor = UIColor.black.cgColor
 //        cell.doneButton.layer.shadowRadius = 5.0
@@ -266,7 +268,11 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        transition.type = CATransitionType.fade
 //        view.window!.layer.add(transition, forKey: kCATransition)
 //        present(destinationVC, animated: false, completion: nil)
-        print("Here")
+        
+//        let indexPath = itemTableView.indexPath(for: cell)
+        array[indexPath.row].done = !array[indexPath.row].done
+        save()
+        self.itemTableView.reloadData()
         
 //        DispatchQueue.main.async {
 //            array[indexPath.row].title.becomeFirstResponder()
@@ -289,13 +295,6 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //            }
 //        }
 //    }
-    
-    func donePressed(cell: CustomItemCell) {
-        let indexPath = itemTableView.indexPath(for: cell)
-        array[indexPath!.row].done = !array[indexPath!.row].done
-        save()
-        self.itemTableView.reloadData()
-    }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: .none) { (action, view, completion) in
