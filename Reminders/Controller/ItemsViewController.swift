@@ -23,7 +23,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //    @IBOutlet weak var bottomSafeView: UIView!
 //    @IBOutlet weak var topSafeView: UIView!
     @IBOutlet weak var tableViewFooter: UIView!
-    @IBOutlet weak var addSomeRemindersLabel: UILabel!
+    @IBOutlet var addSomeRemindersLabel:[UILabel]?
     
     var selectedCategory : Category? {
         // what should happen when a variable gets set with a new value
@@ -50,7 +50,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
             UIView.animate(withDuration: 0.4, animations: {
                 if self.array.count == 0 {
-                    self.addSomeRemindersLabel.layer.opacity = 1.0
+                    for label in self.addSomeRemindersLabel! {
+                        label.layer.opacity = 1.0
+                    }
+                    
                 }
                 self.backButton.layer.opacity = 1.0
                 self.addButton.layer.opacity = 1.0
@@ -71,13 +74,14 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapped))
 //        singleTapGesture.numberOfTapsRequired = 1
 //        view.addGestureRecognizer(singleTapGesture)
-//        
+//
 //        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
 //        doubleTapGesture.numberOfTapsRequired = 2
 //        doubleTapGesture.delegate = self
 //        view.addGestureRecognizer(doubleTapGesture)
-//
+////
 //        singleTapGesture.require(toFail: doubleTapGesture)
+        
     }
     
 //    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
@@ -195,6 +199,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         itemTableView.estimatedRowHeight = 100
         itemTableView.rowHeight = UITableView.automaticDimension
         
+        for label in addSomeRemindersLabel! {
+            label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+        }
+        
     }
     
 //    override func viewWillDisappear(_ animated: Bool) {
@@ -309,7 +317,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.itemTableView.deleteRows(at: [indexPath], with: .automatic)
             if self.array.count == 0 {
                 UIView.animate(withDuration: 0.5) {
-                    self.addSomeRemindersLabel.layer.opacity = 1.0
+                    for label in self.addSomeRemindersLabel! {
+                        label.layer.opacity = 1.0
+                    }
                 }
             }
             
@@ -336,11 +346,11 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func singleTapped() {
-        backButtonPressed(self.backButton)
+        addButtonPressed(self.addButton)
     }
     
     @objc func doubleTapped() {
-        addButtonPressed(self.addButton)
+        backButtonPressed(self.backButton)
     }
     
     @IBAction func backButtonPressed(_ sender: UIButton) {
@@ -408,7 +418,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.itemTableView.reloadData()
         if array.count > 0 {
             UIView.animate(withDuration: 0.5) {
-                self.addSomeRemindersLabel.layer.opacity = 0
+                for label in self.addSomeRemindersLabel! {
+                    label.layer.opacity = 0
+                }
             }
         }
         print("Saved")
@@ -443,7 +455,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         if array.count > 0 {
             UIView.animate(withDuration: 0.5) {
-                self.addSomeRemindersLabel.layer.opacity = 0
+                for label in self.addSomeRemindersLabel! {
+                    label.layer.opacity = 0
+                }
             }
         }
         self.save()
