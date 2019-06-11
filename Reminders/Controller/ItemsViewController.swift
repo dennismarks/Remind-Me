@@ -60,6 +60,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             })
         })
         
+        for item in array {
+            print(item.title!, item.position)
+        }
+        
         let origImage = UIImage(named: "back")
         let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
         backButton.setImage(tintedImage, for: .normal)
@@ -70,6 +74,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         addButton.setImage(tintedImageAdd, for: .normal)
         addButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         
+        curIndex = array.count
         
 //        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapped))
 //        singleTapGesture.numberOfTapsRequired = 1
@@ -219,15 +224,15 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
         cell.reminderLabel.text = data.reminder
-        if data.reminder == "" {
-            cell.topSpace.isActive = false
-            cell.bottomSpace.isActive = false
-            cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.leadingAnchor, constant: 28).isActive = true
-            cell.titleLabel.trailingAnchor.constraint(equalTo: cell.cellContentView.trailingAnchor, constant: 28).isActive = true
-            cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
-            print(cell.titleLabel.constraints)
-        }
+//        if data.reminder == "" {
+//            cell.topSpace.isActive = false
+//            cell.bottomSpace.isActive = false
+//            cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
+//            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.leadingAnchor, constant: 28).isActive = true
+//            cell.titleLabel.trailingAnchor.constraint(equalTo: cell.cellContentView.trailingAnchor, constant: 28).isActive = true
+//            cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
+//            print(cell.titleLabel.constraints)
+//        }
 //        cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         cell.tintColor = .white
@@ -282,10 +287,58 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        view.window!.layer.add(transition, forKey: kCATransition)
 //        present(destinationVC, animated: false, completion: nil)
         
+        let indexToMove = indexPath.row
+        let itemToChange = array[indexToMove]
+        var indexOfFirstDoneEl = 0
+        
+        var flag = false
+        for item in array {
+            if item.done == true {
+                indexOfFirstDoneEl = Int(item.position)
+                flag = true
+                break
+            }
+        }
+        
+        if flag == false {
+            indexOfFirstDoneEl = array.count
+        }
+
+        if array[indexPath.row].done == false {
+            for item in array {
+                if indexToMove < item.position && item.done == false {
+                    item.position -= 1
+                }
+            }
+            
+            itemToChange.position = Int16(indexOfFirstDoneEl - 1)
+        } else {
+            
+            for item in array {
+                if item.position >= indexOfFirstDoneEl && item != itemToChange {
+                    item.position += 1
+                }
+                if item == itemToChange {
+                    
+                    break
+                }
+            }
+            
+            itemToChange.position = Int16(indexOfFirstDoneEl)
+            
+            
+            
+        }
+        
+        
+        
+        
+        
 //        let indexPath = itemTableView.indexPath(for: cell)
         array[indexPath.row].done = !array[indexPath.row].done
         save()
         self.itemTableView.reloadData()
+        load()
         
 //        DispatchQueue.main.async {
 //            array[indexPath.row].title.becomeFirstResponder()
@@ -413,6 +466,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         item.done = false
         item.parentCategory = self.selectedCategory
         item.position = Int16(self.curIndex)
+        curIndex += 1
         self.array.append(item)
         self.save()
         self.itemTableView.reloadData()
@@ -436,6 +490,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         item.reminder = time
         item.done = false
         item.parentCategory = self.selectedCategory
+        item.position = Int16(self.curIndex)
+        curIndex += 1
         self.array.append(item)
         
         
@@ -474,6 +530,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func save() {
         do {
             try self.context.save()
+            for item in array {
+                print(item.title!, item.position)
+            }
         } catch {
             print("Error saving context \(error)")
         }
@@ -481,7 +540,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func load(with request: NSFetchRequest<Item> = Item.fetchRequest(), with predicate: NSPredicate? = nil) {
         let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
+        let sort = NSSortDescriptor(key: "position", ascending: true)
+
         if let searchPredicate = predicate {
             let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, searchPredicate])
             request.predicate = compoundPredicate
@@ -489,6 +549,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             request.predicate = categoryPredicate
         }
         
+        request.sortDescriptors = [sort]
         do {
             array = try context.fetch(request)
         } catch {
