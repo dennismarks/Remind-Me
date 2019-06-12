@@ -191,9 +191,17 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func addNewCategory(name: String, colour: String, tint: String) {
-        UIView.animate(withDuration: 0.5) {
-            self.view.layer.opacity = 1.0
+        
+        if let viewWithTag = self.view.viewWithTag(100) {
+            UIView.animate(withDuration: 0.5, animations: {
+                viewWithTag.layer.opacity = 0.0
+            }) { (true) in
+                viewWithTag.removeFromSuperview()
+            }
         }
+//        UIView.animate(withDuration: 0.5) {
+//            self.view.layer.opacity = 1.0
+//        }
         let category = Category(context: self.context)
         category.name = name
         category.position = Int16(self.curIndex)
@@ -208,9 +216,16 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     
     func dismissView() {
         print("Here1")
-        UIView.animate(withDuration: 0.5) {
-            self.view.layer.opacity = 1.0
+        if let viewWithTag = self.view.viewWithTag(100) {
+            UIView.animate(withDuration: 0.5, animations: {
+                viewWithTag.layer.opacity = 0.0
+            }) { (true) in
+                viewWithTag.removeFromSuperview()
+            }
         }
+//        UIView.animate(withDuration: 0.5) {
+//            self.view.layer.opacity = 1.0
+//        }
     }
     
     func updateUI() {
@@ -227,8 +242,15 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
-        UIView.animate(withDuration: 0.8) {
-            self.view.layer.opacity = 0.6
+        
+        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectViewTop.frame = self.view.bounds
+        visualEffectViewTop.layer.opacity = 0.0
+        visualEffectViewTop.tag = 100
+        self.view.addSubview(visualEffectViewTop)
+        UIView.animate(withDuration: 0.5) {
+//            self.view.layer.opacity = 0.6
+            visualEffectViewTop.layer.opacity = 1.0
         }
         performSegue(withIdentifier: "goToAddCategory", sender: self)
     }
