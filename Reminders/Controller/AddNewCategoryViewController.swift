@@ -16,7 +16,9 @@ protocol UpdateMainViewDelegate {
 class AddNewCategoryViewController: UIViewController {
     
 
-    
+    var colourArray = ["#324047", "#EFEFEF", "#00CECE", "#00A8A8", "#E3A6AE", "#EECECE", "#F7F7F7", "B7C8CB", "#8D8DAA", "#DFDFE2", "#F7F5F2", "F56D91"]
+    var tintColourArray = ["#DADAD0", "#324148", "#016566", "#EFEFEF", "#FFFCF3", "C67E86", "#4485C8", "#6B8E94", "#F6F5F3", "#7A7AA0", "#F6678D", "#F6F5F1"]
+    var colourNames = ["Big Stone", "Super Silver", "Turquoise Surf", "Jade Orchid", "Berry Riche", "Oyster Pink", "Lynx White", "Misty Surf", "Charcoal Dust", "Violet Echo", "White Chalk", "Rosy Pink"]
 
 //    var colourArray = [UIColor]()
     var num = 0
