@@ -9,17 +9,20 @@
 import UIKit
 
 protocol UpdateMainViewDelegate {
-    func addNewCategory(name: String, colour: String)
+    func addNewCategory(name: String, colour: String, tint: String)
     func dismissView()
 }
 
 class AddNewCategoryViewController: UIViewController {
     
-    var colourArray = ["#FFE5D9", "#ECDBD8", "#E2C7C0", "#71768A", "#A8DADC", "#457B9D", "#1D3557", "#247BA0", "#B2DBBF", "#F3FFBD", "#1EBBFF", "#7AFFE6", "#BBFFD0", "#F1FFBC", "#FF0C4D"]
+
+    
+
 //    var colourArray = [UIColor]()
     var num = 0
     var delegate : UpdateMainViewDelegate?
     var chosenColour = ""
+    var chosenTint = ""
     @IBOutlet weak var colourPickerView: UIPickerView!
     @IBOutlet weak var categoryNameTextField: UITextField!
     @IBOutlet weak var buttonsStackView: UIStackView!
@@ -27,6 +30,9 @@ class AddNewCategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         colourPickerView.showsSelectionIndicator = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: {
+            self.categoryNameTextField.becomeFirstResponder()
+        })
         
 //        let colour = hexStringToUIColor(hex: "E2C7C0")
 //        colourArray.append(colour)
@@ -34,20 +40,11 @@ class AddNewCategoryViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidDisappear(true)
+        chosenColour = colourArray[0]
+        chosenTint = tintColourArray[0]
 //        UIView.animate(withDuration: 0.5) {
 //            self.preferredContentSize = CGSize(width: self.view.frame.width - 15, height: self.view.frame.height - 15)
 //        }
-        UIView.animate(withDuration: 1, animations: {
-            self.categoryNameTextField.isHidden = false
-        }) { (true) in
-            UIView.animate(withDuration: 1, animations: {
-                self.colourPickerView.isHidden = false
-            }, completion: { (true) in
-                UIView.animate(withDuration: 1, animations: {
-                    self.buttonsStackView.isHidden = false
-                })
-            })
-        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -56,17 +53,22 @@ class AddNewCategoryViewController: UIViewController {
     }
     
     @IBAction func dismissPressed(_ sender: UIButton) {
+//        categoryNameTextField.resignFirstResponder()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750), execute: {
+//            self.delegate?.dismissView()
+//            self.dismiss(animated: true, completion: nil)
+//        })
+
         self.delegate?.dismissView()
         self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func addNewCategoryPressed(_ sender: UIButton) {
         if let name = categoryNameTextField.text {
-            self.delegate?.addNewCategory(name: name, colour: chosenColour)
+            self.delegate?.addNewCategory(name: name, colour: chosenColour, tint: chosenTint)
         }
         self.dismiss(animated: true, completion: nil)
     }
-    
     
 }
 
@@ -89,6 +91,10 @@ extension AddNewCategoryViewController: UIPickerViewDelegate, UIPickerViewDataSo
 //        label.backgroundColor = hexStringToUIColor(hex: colourArray[row])
         label.layer.cornerRadius = 15.0
         label.layer.backgroundColor = hexStringToUIColor(hex: colourArray[row]).cgColor
+        label.textAlignment = .center
+        label.text = colourNames[row]
+        label.textColor = hexStringToUIColor(hex: tintColourArray[row])
+        label.font = UIFont(name: "AvenirNext-Regular", size: 22.0)
         
         return label
     }
@@ -110,6 +116,7 @@ extension AddNewCategoryViewController: UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         chosenColour = colourArray[row]
+        chosenTint = tintColourArray[row]
     }
     
     func hexStringToUIColor (hex:String) -> UIColor {
