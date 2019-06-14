@@ -24,6 +24,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     
     var array = [Category]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var curIndexPath : IndexPath?
     
     var curIndex = 0
     var from = 0
@@ -99,10 +100,10 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         topSafeView.frame.size.height = safeFrame.minY
         topSafeView.frame.size.width = view.frame.width
         
-        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         visualEffectViewTop.frame = topSafeView.bounds
 
-        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         visualEffectViewBot.frame = bottomSafeView.bounds
         
         topSafeView.addSubview(visualEffectViewTop)
@@ -112,6 +113,11 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
         addButton.setImage(tintedImage, for: .normal)
         addButton.tintColor = .black
+        
+//        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//        blur.frame = addButton.bounds
+//        blur.isUserInteractionEnabled = false //This allows touches to forward to the button.
+//        addButton.insertSubview(blur, at: 0)
     }
     
     var openingFrame: CGRect?
@@ -188,6 +194,26 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
             destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
         }
+        else if segue.identifier == "goToEditCategory" {
+            let destinationVC = segue.destination as! EditCategoryViewController
+//            destinationVC.delegate = self
+            destinationVC.modalPresentationStyle = .popover
+            let popOverVC = destinationVC.popoverPresentationController
+            popOverVC?.delegate = self
+            let cell =  self.tableView.cellForRow(at: curIndexPath!) as! CustomCategoryCell
+            popOverVC?.sourceView = cell.nameLabel
+            let viewHeight = self.view.frame.height
+            let rect = self.tableView.rectForRow(at: curIndexPath!)
+            let rectInScreen = self.tableView.convert(rect, to: tableView.superview)
+            print(viewHeight)
+            print(rectInScreen.midY)
+            if (viewHeight / 2 > rectInScreen.midY) {
+                popOverVC?.sourceRect = CGRect(x: cell.nameLabel.bounds.midX, y: cell.nameLabel.bounds.minY + 40, width: 0, height: 0)
+            } else {
+                popOverVC?.sourceRect = CGRect(x: cell.nameLabel.bounds.midX, y: cell.nameLabel.bounds.minY, width: 0, height: 0)
+            }
+            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
+        }
     }
     
     func addNewCategory(name: String, colour: String, tint: String) {
@@ -256,7 +282,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
+        let deleteAction = UIContextualAction(style: .destructive, title: .none) { (action, view, completion) in
             let index = indexPath.row
             self.context.delete(self.array[indexPath.row])
             self.array.remove(at: indexPath.row)
@@ -273,14 +299,19 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             self.save()
             completion(true)
         }
-//        let editAction = UIContextualAction(style: .normal, title: "Edit") { (action, view, completion) in
-//            //            self.save()
-//            completion(true)
-//        }
-        //        deleteAction.image = UIImage(named: "delete")
-        //        deleteAction.backgroundColor = .white
-//        editAction.backgroundColor = .orange
-        return UISwipeActionsConfiguration(actions: [deleteAction])
+        let editAction = UIContextualAction(style: .normal, title: .none) { (action, view, completion) in
+            self.curIndexPath = indexPath
+            self.performSegue(withIdentifier: "goToEditCategory", sender: self)
+            completion(true)
+        }
+        
+        deleteAction.image = UIImage(named: "delete")
+        deleteAction.backgroundColor = hexStringToUIColor(hex: "#DE615F")
+
+        editAction.image = UIImage(named: "edit")
+        editAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
+
+        return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
     
