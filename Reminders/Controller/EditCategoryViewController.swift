@@ -10,6 +10,7 @@ import UIKit
 
 protocol UpdateUIAfterClosingEditCategoryDelegate {
     func dismissEditView()
+    func editCategory(name: String, colour: String, tint: String)
 }
 
 class EditCategoryViewController: UIViewController {
@@ -34,7 +35,6 @@ class EditCategoryViewController: UIViewController {
         newCategoryColour.showsSelectionIndicator = false
         self.newCategoryName.becomeFirstResponder()
         self.newCategoryName.text = categoryName
-        
         var index = 0
         for item in colourArray {
             if item == categoryColour {
@@ -42,14 +42,21 @@ class EditCategoryViewController: UIViewController {
             }
             index += 1
         }
-        print("Index is \(index)")
         self.newCategoryColour.selectRow(index, inComponent: 0, animated: true)
+        self.chosenColour = categoryColour
+        self.chosenTint = tintColourArray[index]
     }
     
     @IBAction func cancelButtonPressed(_ sender: UIButton) {
         delegate?.dismissEditView()
         dismiss(animated: true, completion: nil)
     }
+    
+    @IBAction func saveButtonPressed(_ sender: UIButton) {
+        delegate?.editCategory(name: newCategoryName.text!, colour: chosenColour, tint: chosenTint)
+        dismiss(animated: true, completion: nil)
+    }
+    
     
 
 }

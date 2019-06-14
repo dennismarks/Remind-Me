@@ -174,6 +174,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
 //        cell.layer.cornerRadius = 15
         cell.selectionStyle = .none
 //        cell.backgroundColor = hexStringToUIColor(hex: colourArray[indexPath.row])
+        cell.cellColourString = array[indexPath.row].colour!
         cell.backgroundColor = hexStringToUIColor(hex: array[indexPath.row].colour!)
         cell.nameLabel.textColor = hexStringToUIColor(hex: array[indexPath.row].tintColour!)
         return cell
@@ -222,6 +223,9 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         else if segue.identifier == "goToEditCategory" {
             moveView = false
             let destinationVC = segue.destination as! EditCategoryViewController
+            let cell = self.tableView.cellForRow(at: curIndexPath!) as! CustomCategoryCell
+            destinationVC.categoryName = cell.nameLabel!.text!
+            destinationVC.categoryColour = cell.cellColourString
             destinationVC.delegate = self
             destinationVC.modalPresentationStyle = .popover
             let popOverVC = destinationVC.popoverPresentationController
@@ -254,6 +258,10 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         self.save()
         self.tableView.reloadData()
         print("Saved new category")
+    }
+    
+    func editCategory(name: String, colour: String, tint: String) {
+        print(name, colour, tint)
     }
     
     func dismissView() {
