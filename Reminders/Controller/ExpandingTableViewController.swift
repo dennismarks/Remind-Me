@@ -261,7 +261,13 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func editCategory(name: String, colour: String, tint: String) {
+        self.moveView = true
         print(name, colour, tint)
+        array[(curIndexPath?.row)!].setValue(name, forKey: "name")
+        array[(curIndexPath?.row)!].setValue(colour, forKey: "colour")
+        array[(curIndexPath?.row)!].setValue(tint, forKey: "tintColour")
+        save()
+        self.tableView.reloadData()
     }
     
     func dismissView() {
@@ -275,6 +281,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
 //        }
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
+//            self.tableView.layer.opacity = 1.0
         }
     }
     
@@ -304,6 +311,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
 //        self.view.addSubview(visualEffectViewTop)
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 0.6
+//            self.tableView.layer.opacity = 0.6
+            
 //            visualEffectViewTop.layer.opacity = 1.0
         }
         performSegue(withIdentifier: "goToAddCategory", sender: self)
