@@ -485,6 +485,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func addNewItem(name: String) {
         let item = Item(context: self.context)
         item.title = name
+        item.reminderDateType = nil
         item.reminder = ""
         item.done = false
         item.parentCategory = self.selectedCategory
@@ -544,12 +545,23 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.itemTableView.reloadData()
     }
     
-    func editNewItem(name: String) {
-        print(name)
+    func editItem(name: String) {
+        array[(curIndexPath?.row)!].setValue(nil, forKey: "reminderDateType")
+        array[(curIndexPath?.row)!].setValue("", forKey: "reminder")
+        array[(curIndexPath?.row)!].setValue(name, forKey: "title")
+        save()
+        self.itemTableView.reloadData()
     }
     
-    func editNewItem(name: String, reminder: UIDatePicker) {
-        print(name, reminder)
+    func editItem(name: String, reminder: UIDatePicker) {
+        let formatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("EEE, MMM d hh:mm aaa")
+        let time = formatter.string(from: reminder.date)
+        array[(curIndexPath?.row)!].setValue(reminder.date, forKey: "reminderDateType")
+        array[(curIndexPath?.row)!].setValue(time, forKey: "reminder")
+        array[(curIndexPath?.row)!].setValue(name, forKey: "title")
+        save()
+        self.itemTableView.reloadData()
     }
     
     
