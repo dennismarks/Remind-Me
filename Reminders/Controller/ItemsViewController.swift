@@ -15,7 +15,7 @@ protocol UpdateUIAfterGoBackDelegate {
     func updateUI()
 }
 
-class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, UIGestureRecognizerDelegate {
+class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddNewItemDelegate, UIGestureRecognizerDelegate, UpdateUIAfterEditItemDelegate {
     
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
@@ -35,6 +35,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var tableViewColour : String = ""
     var delegate : UpdateUIAfterGoBackDelegate?
     var array = [Item]()
+    var curIndexPath: IndexPath?
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     var curIndex = 0
@@ -224,15 +225,14 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
         cell.reminderLabel.text = data.reminder
-//        if data.reminder == "" {
-//            cell.topSpace.isActive = false
-//            cell.bottomSpace.isActive = false
-//            cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
-//            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.leadingAnchor, constant: 28).isActive = true
-//            cell.titleLabel.trailingAnchor.constraint(equalTo: cell.cellContentView.trailingAnchor, constant: 28).isActive = true
-//            cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
+        if data.reminder == "" {
+            cell.topSpace.isActive = false
+            cell.bottomSpace.isActive = false
+            cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.leadingAnchor, constant: 28).isActive = true
+            cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
 //            print(cell.titleLabel.constraints)
-//        }
+        }
 //        cell.accessoryType = data.done ? .checkmark : .none
         cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         cell.tintColor = .white
@@ -387,15 +387,21 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.save()
             completion(true)
         }
-//        let editAction = UIContextualAction(style: .normal, title: "Edit") { (action, view, completion) in
-//            //            self.save()
-//            completion(true)
-//        }
+        let editAction = UIContextualAction(style: .normal, title: .none) { (action, view, completion) in
+            //            self.save()
+            self.curIndexPath = indexPath
+            self.performSegue(withIdentifier: "goToEditItem", sender: self)
+            completion(true)
+        }
         deleteAction.image = UIImage(named: "delete")
         deleteAction.backgroundColor = hexStringToUIColor(hex: "#DE615F")
         
+        editAction.image = UIImage(named: "edit")
+        editAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
+
+        
 //        editAction.backgroundColor = .orange
-        return UISwipeActionsConfiguration(actions: [deleteAction])
+        return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
     @objc func singleTapped() {
@@ -417,6 +423,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
+
         UIView.animate(withDuration: 0.8) {
             self.view.layer.opacity = 0.6
         }
@@ -456,6 +463,22 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             popOverVC?.sourceView = self.addButton
             popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
             destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
+        } else if segue.identifier == "goToEditItem" {
+            let destinationVC = segue.destination as! EditItemViewController
+            let cell = self.itemTableView.cellForRow(at: curIndexPath!) as! CustomItemCell
+            destinationVC.itemName = cell.titleLabel!.text!
+            destinationVC.reminderDate = array[(curIndexPath?.row)!].reminderDateType
+            destinationVC.delegate = self
+            destinationVC.modalPresentationStyle = .popover
+            let popOverVC = destinationVC.popoverPresentationController
+            popOverVC?.delegate = self
+            popOverVC?.permittedArrowDirections = UIPopoverArrowDirection(rawValue:0)
+            popOverVC?.sourceView = self.itemTableView
+            if cell.reminderLabel.text != "" {
+                destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
+            } else {
+                destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
+            }
         }
     }
     
@@ -486,6 +509,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let time = formatter.string(from: reminder.date)
         print(time)
         let item = Item(context: self.context)
+        item.reminderDateType = reminder.date
         item.title = name
         item.reminder = time
         item.done = false
@@ -518,8 +542,17 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         self.save()
         self.itemTableView.reloadData()
-        
     }
+    
+    func editNewItem(name: String) {
+        print(name)
+    }
+    
+    func editNewItem(name: String, reminder: UIDatePicker) {
+        print(name, reminder)
+    }
+    
+    
     
     func dismissView() {
         UIView.animate(withDuration: 0.5) {
