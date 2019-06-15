@@ -90,49 +90,6 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
     }
     
-//    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-//        if touch.view is UIButton {
-//            return false
-//        }
-//        return true
-//    }
-    
-//    func handlePanGesture(panGesture: UIPanGestureRecognizer) {
-//
-//        let percent = max(panGesture.translation(in: view).x, 0) / view.frame.width
-//
-//        switch panGesture.state {
-//
-//        case .began:
-//            navigationController?.delegate = self
-//            navigationController?.popViewControllerAnimated(true)
-//
-//        case .Changed:
-//            percentDrivenInteractiveTransition.updateInteractiveTransition(percent)
-//
-//        case .Ended:
-//            let velocity = panGesture.velocityInView(view).x
-//
-//            // Continue if drag more than 50% of screen width or velocity is higher than 1000
-//            if percent > 0.5 || velocity > 1000 {
-//                percentDrivenInteractiveTransition.finishInteractiveTransition()
-//            } else {
-//                percentDrivenInteractiveTransition.cancelInteractiveTransition()
-//            }
-//
-//        case .Cancelled, .Failed:
-//            percentDrivenInteractiveTransition.cancelInteractiveTransition()
-//
-//        default:
-//            break
-//        }
-//    }
-    
-
-//    override var prefersStatusBarHidden: Bool {
-//        return true
-//    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
@@ -157,14 +114,15 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
 //        bottomSafeView.frame.size.height = window.frame.maxY - safeFrame.maxY
 //        bottomSafeView.frame.size.width = view.frame.width
+        print(safeFrame.minY)
         
         topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
         topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
         topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY).isActive = true
+        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY + 30).isActive = true
         topSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
         topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        topSafeView.frame.size.height = safeFrame.minY
+        topSafeView.frame.size.height = safeFrame.minY + 30
         topSafeView.frame.size.width = view.frame.width
         
         let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
@@ -174,6 +132,26 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        visualEffectViewBot.frame = bottomSafeView.bounds
         
         topSafeView.addSubview(visualEffectViewTop)
+        
+        let label = UILabel()
+        self.view.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = (self.selectedCategory?.name)!
+        label.frame.size.width = view.frame.width
+        label.frame.size.height = 30
+        label.font = UIFont(name: "HelveticaNeue-Light", size: 20.0)
+        label.textAlignment = .center
+//        label.textColor = hexStringToUIColor(hex: (self.selectedCategory?.tintColour)!)
+        label.textColor = .black
+        label.topAnchor.constraint(equalTo: view.topAnchor, constant: safeFrame.minY).isActive = true
+        label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+//        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//        label.heightAnchor.constraint(equalToConstant: 30).isActive = true
+
+
+        
+//        self.itemTableView.topAnchor.constraint(equalTo: topSafeView.bottomAnchor, constant: 0).isActive = true
 //        bottomSafeView.addSubview(visualEffectViewBot)
         
 //        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
@@ -270,96 +248,89 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return cell
     }
     
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return UITableView.automaticDimension
-//    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return array.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        guard let destinationVC = storyboard?.instantiateViewController(withIdentifier: "ItemSettingsViewController") as? ItemSettingsViewController else { return }
-//        let transition = CATransition()
-//        transition.duration = 0.5
-//        transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-//        transition.type = CATransitionType.fade
-//        view.window!.layer.add(transition, forKey: kCATransition)
-//        present(destinationVC, animated: false, completion: nil)
         
-        let indexToMove = indexPath.row
-        let itemToChange = array[indexToMove]
-        var indexOfFirstDoneEl = 0
-        
-        var flag = false
-        for item in array {
-            if item.done == true {
-                indexOfFirstDoneEl = Int(item.position)
-                flag = true
-                break
-            }
-        }
-        
-        if flag == false {
-            indexOfFirstDoneEl = array.count
-        }
-
-        if array[indexPath.row].done == false {
-            for item in array {
-                if indexToMove < item.position && item.done == false {
-                    item.position -= 1
-                }
-            }
-            
-            itemToChange.position = Int16(indexOfFirstDoneEl - 1)
-        } else {
-            
-            for item in array {
-                if item.position >= indexOfFirstDoneEl && item != itemToChange {
-                    item.position += 1
-                }
-                if item == itemToChange {
-                    
-                    break
-                }
-            }
-            
-            itemToChange.position = Int16(indexOfFirstDoneEl)
-            
-            
-            
-        }
-        
-        
-        
-        
-        
-//        let indexPath = itemTableView.indexPath(for: cell)
-        array[indexPath.row].done = !array[indexPath.row].done
-        save()
-        self.itemTableView.reloadData()
-        load()
-        
-//        DispatchQueue.main.async {
-//            array[indexPath.row].title.becomeFirstResponder()
-//        }
-        
-//        let cell = tableView.cellForRow(at: indexPath) as? CustomItemCell
-//        if cell!.isKind(of: CustomItemCell.self) {
-//            if let yourCell = cell as? CustomItemCell{
-//                yourCell.titleLabel.becomeFirstResponder()
+//        let indexToMove = indexPath.row
+//        let itemToChange = array[indexToMove]
+//        var indexOfFirstDoneEl = 0
+//
+//        var flag = false
+//        for item in array {
+//            if item.done == true {
+//                indexOfFirstDoneEl = Int(item.position)
+//                flag = true
+//                break
 //            }
 //        }
-        
+//
+//        if flag == false {
+//            indexOfFirstDoneEl = array.count
+//        }
+//
+//        if array[indexPath.row].done == false {
+//            for item in array {
+//                if indexToMove < item.position && item.done == false {
+//                    item.position -= 1
+//                }
+//            }
+//            curIndex -= 1
+//            itemToChange.position = Int16(indexOfFirstDoneEl)
+//        } else {
+//            for item in array {
+//                if item.position >= indexOfFirstDoneEl && item != itemToChange {
+//                    item.position += 1
+//                }
+//                if item == itemToChange {
+//
+//                    break
+//                }
+//            }
+//            itemToChange.position = Int16(indexOfFirstDoneEl)
+//        }
+//
+//        array[indexPath.row].done = !array[indexPath.row].done
+//        save()
+//        load()
+//        self.itemTableView.reloadData()
+//        for item in array {
+//            print(item.title)
+//        }
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        if cell.isKind(of: CustomItemCell.self) {
-//            if let yourCell = cell as? CustomItemCell{
-//                yourCell.titleLabel.becomeFirstResponder()
-//            }
-//        }
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 30))
+//        headerView.backgroundColor = hexStringToUIColor(hex: (self.selectedCategory?.colour)!)
+//
+//        let label = UILabel()
+//        label.frame = CGRect.init(x: 0, y: 0, width: headerView.frame.width, height: headerView.frame.height)
+//        label.text = "Reminders Section"
+//        label.textAlignment = .center
+//        label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
+//
+//        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+//        visualEffectViewTop.frame = label.bounds
+//
+//        //        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//        //        visualEffectViewBot.frame = bottomSafeView.bounds
+//
+//
+////        label.font = UIFont().futuraPTMediumFont(16) // my custom font
+////        label.textColor = UIColor.charcolBlackColour() // my custom colour
+//
+//        headerView.addSubview(label)
+//
+//        return headerView
+//    }
+//
+//
+////
+//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        return 30
 //    }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -388,7 +359,6 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             completion(true)
         }
         let editAction = UIContextualAction(style: .normal, title: .none) { (action, view, completion) in
-            //            self.save()
             self.curIndexPath = indexPath
             self.performSegue(withIdentifier: "goToEditItem", sender: self)
             completion(true)
@@ -398,9 +368,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         editAction.image = UIImage(named: "edit")
         editAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
-
         
-//        editAction.backgroundColor = .orange
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
@@ -423,34 +391,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
-
         UIView.animate(withDuration: 0.8) {
             self.view.layer.opacity = 0.6
         }
         performSegue(withIdentifier: "goToAddItem", sender: self)
-        
-//        var textField = UITextField()
-//        let alert = UIAlertController(title: "Add new item", message: .none, preferredStyle: .alert)
-//        let add = UIAlertAction(title: "Add item", style: .default) { (UIAlertAction) in
-//            if let text = textField.text {
-//                let item = Item(context: self.context)
-//                item.title = text
-//                item.done = false
-//                item.parentCategory = self.selectedCategory
-//                self.array.append(item)
-//                self.save()
-//                self.itemTableView.reloadData()
-//                print("Saved")
-//            }
-//        }
-//        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (UIAlertAction) in }
-//        alert.addTextField { (UITextField) in
-//            UITextField.placeholder = "Create new item"
-//            textField = UITextField
-//        }
-//        alert.addAction(add)
-//        alert.addAction(cancel)
-//        present(alert, animated: true)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -528,6 +472,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        content.subtitle = "Notification Subtitle"
         content.body = item.title!
         
+        
         // declaring the trigger
         let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.date)
         let calendarTrigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
@@ -580,6 +525,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             for item in array {
                 print(item.title!, item.position)
             }
+            print("Cur index - \(curIndex)")
         } catch {
             print("Error saving context \(error)")
         }
