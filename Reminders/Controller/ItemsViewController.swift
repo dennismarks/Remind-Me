@@ -522,6 +522,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         // declare the content of the notification:
         let content = UNMutableNotificationContent()
+        content.sound = UNNotificationSound.default
+//        content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "out.caf"))
         content.title = selectedCategory!.name!
 //        content.subtitle = "Notification Subtitle"
         content.body = item.title!
