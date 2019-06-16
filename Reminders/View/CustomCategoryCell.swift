@@ -11,6 +11,8 @@ import UIKit
 class CustomCategoryCell: UITableViewCell {
     
     @IBOutlet weak var nameLabel: UILabel!
+    
+    var cellColourString = ""
 
     override func awakeFromNib() {
         super.awakeFromNib()

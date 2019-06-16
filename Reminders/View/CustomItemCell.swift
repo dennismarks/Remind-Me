@@ -9,13 +9,20 @@
 import UIKit
 
 class CustomItemCell: UITableViewCell {
-    
+        
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var view: UIView!
+    @IBOutlet weak var reminderLabel: UILabel!
     @IBOutlet weak var doneButton: UIButton!
+    @IBOutlet weak var cellContentView: UIView!
+    @IBOutlet weak var separationLine: UIView!
+    
+    @IBOutlet weak var topSpace: NSLayoutConstraint!
+    @IBOutlet weak var bottomSpace: NSLayoutConstraint!
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
+
         // Initialization code
     }
 
@@ -23,8 +30,11 @@ class CustomItemCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    @IBAction func doneButtonPressed(_ sender: UIButton) {
-    }
+//    @IBAction func doneButtonPressed(_ sender: UIButton) {
+//        print(self.delegate)
+//        guard let cell = sender.superview?.superview as? CustomItemCell else { return }
+//        self.delegate?.donePressed(cell: cell)
+//    }
     
     
 //    override var frame: CGRect {
