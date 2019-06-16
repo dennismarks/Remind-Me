@@ -19,7 +19,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @IBOutlet weak var itemTableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var backButtonBlurView: UIView!
     @IBOutlet weak var addButton: UIButton!
+    @IBOutlet weak var addButtonBlurView: UIView!
+    
 //    @IBOutlet weak var bottomSafeView: UIView!
 //    @IBOutlet weak var topSafeView: UIView!
     @IBOutlet weak var tableViewFooter: UIView!
@@ -58,6 +61,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
                 self.backButton.layer.opacity = 1.0
                 self.addButton.layer.opacity = 1.0
+                self.addButtonBlurView.layer.opacity = 1.0
+                self.backButtonBlurView.layer.opacity = 1.0
             })
         })
         
@@ -77,6 +82,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         curIndex = array.count
         
+        
+//        self.itemTableView?.frame = CGRect(x: 0, y: height, width: UIScreen.mainScreen.bounds.width, height: (UIScreen.mainScreen().bounds.height - height))
+        
 //        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTapped))
 //        singleTapGesture.numberOfTapsRequired = 1
 //        view.addGestureRecognizer(singleTapGesture)
@@ -93,91 +101,43 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
-//        UIApplication.shared.isStatusBarHidden = true
-        
         let topSafeView = UIView()
-//        let bottomSafeView = UIView()
-        
+
         self.view.addSubview(topSafeView)
-//        self.view.addSubview(bottomSafeView)
-        
-//        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
+
         topSafeView.translatesAutoresizingMaskIntoConstraints = false
         let window = UIApplication.shared.windows[0]
         let safeFrame = window.safeAreaLayoutGuide.layoutFrame
-        
-//        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
-//        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-//        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-//        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
-//        bottomSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
-//        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        bottomSafeView.frame.size.height = window.frame.maxY - safeFrame.maxY
-//        bottomSafeView.frame.size.width = view.frame.width
+
         print(safeFrame.minY)
-        
+
         topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
         topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
         topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY + 30).isActive = true
+        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY + 26).isActive = true
         topSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
         topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        topSafeView.frame.size.height = safeFrame.minY + 30
+        topSafeView.frame.size.height = safeFrame.minY + 26
         topSafeView.frame.size.width = view.frame.width
-        
+
         let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         visualEffectViewTop.frame = topSafeView.bounds
-        
-//        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-//        visualEffectViewBot.frame = bottomSafeView.bounds
-        
+
         topSafeView.addSubview(visualEffectViewTop)
-        
+
         let label = UILabel()
         self.view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = (self.selectedCategory?.name)!
         label.frame.size.width = view.frame.width
         label.frame.size.height = 30
-        label.font = UIFont(name: "HelveticaNeue-Light", size: 20.0)
+        label.font = UIFont(name: "SFProText-Semibold", size: 17.0)
         label.textAlignment = .center
-//        label.textColor = hexStringToUIColor(hex: (self.selectedCategory?.tintColour)!)
         label.textColor = .black
         label.topAnchor.constraint(equalTo: view.topAnchor, constant: safeFrame.minY).isActive = true
         label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
         label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-//        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        label.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-
-        
-//        self.itemTableView.topAnchor.constraint(equalTo: topSafeView.bottomAnchor, constant: 0).isActive = true
-//        bottomSafeView.addSubview(visualEffectViewBot)
-        
-//        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
-        
-        
-        
-        
-//        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
-//        topSafeView.translatesAutoresizingMaskIntoConstraints = false
-//        let window = UIApplication.shared.windows[0]
-//        let safeFrame = window.safeAreaLayoutGuide.layoutFrame
-        
-//        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
-//        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-//        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-//        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
-//        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//
-//        topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
-//        topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-//        topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-//        topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY).isActive = true
-//        topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//
-//        bottomSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
-//        topSafeView.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         tableViewFooter.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         
         itemTableView.estimatedRowHeight = 100
@@ -186,6 +146,24 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         for label in addSomeRemindersLabel! {
             label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         }
+        
+        
+        addButtonBlurView.layer.cornerRadius = addButtonBlurView.frame.height / 2
+        let visualEffectAddButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectAddButton.frame = addButtonBlurView.bounds
+        visualEffectAddButton.layer.cornerRadius = addButtonBlurView.frame.height / 2
+        visualEffectAddButton.clipsToBounds = true
+        addButtonBlurView.addSubview(visualEffectAddButton)
+        addButtonBlurView.addSubview(addButton)
+        
+        backButtonBlurView.layer.cornerRadius = backButtonBlurView.frame.height / 2
+        let visualEffectBackButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectBackButton.frame = backButtonBlurView.bounds
+        visualEffectBackButton.layer.cornerRadius = backButtonBlurView.frame.height / 2
+        visualEffectBackButton.clipsToBounds = true
+        backButtonBlurView.addSubview(visualEffectBackButton)
+        backButtonBlurView.addSubview(backButton)
+        
         
     }
     
@@ -363,11 +341,14 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.performSegue(withIdentifier: "goToEditItem", sender: self)
             completion(true)
         }
+
         deleteAction.image = UIImage(named: "delete")
         deleteAction.backgroundColor = hexStringToUIColor(hex: "#DE615F")
-        
+//        deleteAction.backgroundColor = .black
+
         editAction.image = UIImage(named: "edit")
         editAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
+//        editAction.backgroundColor = .black
         
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
@@ -385,6 +366,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         UIView.animate(withDuration: 0.065) {
             self.addButton.layer.opacity = 0.0
             self.backButton.layer.opacity = 0.0
+            self.addButtonBlurView.layer.opacity = 0.0
+            self.backButtonBlurView.layer.opacity = 0.0
         }
         self.delegate?.updateUI()
         self.dismiss(animated: true, completion: nil)
@@ -585,5 +568,18 @@ extension ItemsViewController: UIPopoverPresentationControllerDelegate {
     
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
+    }
+}
+
+
+extension UIView {
+    
+    // Using a function since `var image` might conflict with an existing variable
+    // (like on `UIImageView`)
+    func asImage() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(bounds: bounds)
+        return renderer.image { rendererContext in
+            layer.render(in: rendererContext.cgContext)
+        }
     }
 }
