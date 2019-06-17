@@ -25,19 +25,41 @@ class AddNewItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 //        Date().localizedDescription
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250), execute: {
+            self.itemNameTextField.becomeFirstResponder()
+        })
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(260), execute: {
+            self.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
+
+        })
+        
+//        self.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(true)
+        itemNameTextField.resignFirstResponder()
         self.delegate?.dismissView()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(700), execute: {
+//            self.delegate?.dismissView()
+//        })
     }
     
     @IBAction func dismissPressed(_ sender: UIButton) {
+//        itemNameTextField.resignFirstResponder()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750), execute: {
+//            self.delegate?.dismissView()
+//            self.dismiss(animated: true, completion: nil)
+//        })
+        itemNameTextField.resignFirstResponder()
         self.delegate?.dismissView()
         self.dismiss(animated: true, completion: nil)
+        
     }
     
     @IBAction func addNewCategoryPressed(_ sender: UIButton) {
+        itemNameTextField.resignFirstResponder()
+
         guard let name = itemNameTextField.text else {
             print("Name is empty")
             return
@@ -52,25 +74,6 @@ class AddNewItemViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    func getDateStamp(date:String)-> String{
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss +SSSS"
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-        
-        guard let date = dateFormatter.date(from: date) else {
-            //  assert(false, "no date from string")
-            return ""
-        }
-        
-        dateFormatter.dateFormat = "dd MMMM,yyyy" //"yyyy-MM-dd"
-        dateFormatter.timeZone = TimeZone.current
-        
-        let st = dateFormatter.string(from: date)
-        
-        return st
-    }
-    
     @IBAction func addReminderPressed(_ sender: UIButton) {
         if (active == false) {
             print(active)
@@ -82,7 +85,7 @@ class AddNewItemViewController: UIViewController {
             }
         } else {
             active = !active
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500), execute: {
                 self.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
             })
             UIView.animate(withDuration: 1) {
