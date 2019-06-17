@@ -46,6 +46,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var to = 0
     var curRow = 0
     
+    let topSafeView = UIView()
+    let bottomSafeView = UIView()
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
@@ -96,21 +100,60 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 ////
 //        singleTapGesture.require(toFail: doubleTapGesture)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+//        if moveView {
+        print("Show \(self.addButtonBlurView.frame.origin.y)")
+            if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+//                keySize = keyboardSize.height
+                if self.view.frame.origin.y == 0 {
+                    print("Keyboard \(keyboardSize.height)")
+                    self.view.frame.origin.y = self.view.frame.origin.y - keyboardSize.height + self.bottomSafeView.frame.height
+//                    self.addButtonBlurView.frame.origin.y = self.addButtonBlurView.frame.origin.y - keyboardSize.height + self.bottomSafeView.frame.height
+                }
+//                self.bottomSafeView.layer.opacity = 0.0
+                //            self.tableView.layer.opacity = 0.6
+                //            self.addButton.layer.opacity = 1.0
+            }
+//        }
+
+    }
+
+    @objc func keyboardWillHide(notification: NSNotification) {
+        print("Hide \(self.addButtonBlurView.frame.origin.y)")
+        if self.view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+        self.viewWillAppear(true)
+//        self.bottomSafeView.layer.opacity = 1.0
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
-        let topSafeView = UIView()
-
         self.view.addSubview(topSafeView)
-
+        self.view.addSubview(bottomSafeView)
+        
+        bottomSafeView.translatesAutoresizingMaskIntoConstraints = false
         topSafeView.translatesAutoresizingMaskIntoConstraints = false
         let window = UIApplication.shared.windows[0]
         let safeFrame = window.safeAreaLayoutGuide.layoutFrame
 
         print(safeFrame.minY)
 
+        bottomSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        bottomSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        bottomSafeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+        bottomSafeView.heightAnchor.constraint(equalToConstant: window.frame.maxY - safeFrame.maxY).isActive = true
+        bottomSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+        bottomSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        bottomSafeView.frame.size.height = window.frame.maxY - safeFrame.maxY
+        bottomSafeView.frame.size.width = view.frame.width
+        
         topSafeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
         topSafeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
         topSafeView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
@@ -119,11 +162,16 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         topSafeView.frame.size.height = safeFrame.minY + 26
         topSafeView.frame.size.width = view.frame.width
-
+        
+        
         let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         visualEffectViewTop.frame = topSafeView.bounds
-
+        
+        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectViewBot.frame = bottomSafeView.bounds
+        
         topSafeView.addSubview(visualEffectViewTop)
+        bottomSafeView.addSubview(visualEffectViewBot)
 
         let label = UILabel()
         self.view.addSubview(label)
@@ -155,7 +203,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         visualEffectAddButton.clipsToBounds = true
         addButtonBlurView.addSubview(visualEffectAddButton)
         addButtonBlurView.addSubview(addButton)
-        
+
         backButtonBlurView.layer.cornerRadius = backButtonBlurView.frame.height / 2
         let visualEffectBackButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         visualEffectBackButton.frame = backButtonBlurView.bounds
@@ -163,17 +211,18 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         visualEffectBackButton.clipsToBounds = true
         backButtonBlurView.addSubview(visualEffectBackButton)
         backButtonBlurView.addSubview(backButton)
-        
+
+        print("button loc \(addButtonBlurView)")
         
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(true)
-//        UIApplication.shared.isStatusBarHidden = false
-//        var prefersStatusBarHidden: Bool {
-//            return false
-//        }
-//    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        UIApplication.shared.isStatusBarHidden = false
+        var prefersStatusBarHidden: Bool {
+            return false
+        }
+    }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -280,37 +329,6 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: tableView.frame.width, height: 30))
-//        headerView.backgroundColor = hexStringToUIColor(hex: (self.selectedCategory?.colour)!)
-//
-//        let label = UILabel()
-//        label.frame = CGRect.init(x: 0, y: 0, width: headerView.frame.width, height: headerView.frame.height)
-//        label.text = "Reminders Section"
-//        label.textAlignment = .center
-//        label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
-//
-//        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
-//        visualEffectViewTop.frame = label.bounds
-//
-//        //        let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-//        //        visualEffectViewBot.frame = bottomSafeView.bounds
-//
-//
-////        label.font = UIFont().futuraPTMediumFont(16) // my custom font
-////        label.textColor = UIColor.charcolBlackColour() // my custom colour
-//
-//        headerView.addSubview(label)
-//
-//        return headerView
-//    }
-//
-//
-////
-//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return 30
-//    }
-    
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: .none) { (action, view, completion) in
             let index = indexPath.row
@@ -387,9 +405,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             destinationVC.modalPresentationStyle = .popover
             let popOverVC = destinationVC.popoverPresentationController
             popOverVC?.delegate = self
-            popOverVC?.sourceView = self.addButton
-            popOverVC?.sourceRect = CGRect(x: self.addButton.bounds.midX, y: self.addButton.bounds.minY - 3, width: 0, height: 0)
-            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
+            popOverVC?.sourceView = self.addButtonBlurView
+            print("Height \(self.bottomSafeView.frame.height)")
+            popOverVC?.sourceRect = CGRect(x: self.addButtonBlurView.bounds.midX, y: self.addButtonBlurView.bounds.minY, width: 0, height: 0)
+            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
         } else if segue.identifier == "goToEditItem" {
             let destinationVC = segue.destination as! EditItemViewController
             let cell = self.itemTableView.cellForRow(at: curIndexPath!) as! CustomItemCell
