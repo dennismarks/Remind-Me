@@ -15,6 +15,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIButton!
+    @IBOutlet weak var addButtonBlurView: UIView!
+    
 //    @IBOutlet weak var topSafeView: UIView!
 //    @IBOutlet weak var bottomSafeView: UIView!
     
@@ -55,6 +57,20 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         for item in array {
             print(item.name!, item.position)
         }
+        
+        print("\n")
+        
+//        let myview = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+//        myview.backgroundColor = .darkGray
+//        self.view.addSubview(myview)
+//        for family: String in UIFont.familyNames
+//        {
+//            print(family)
+//            for names: String in UIFont.fontNames(forFamilyName: family)
+//            {
+//                print("== \(names)")
+//            }
+//        }
         
 //        // Find size for blur effect.
 //        let statusBarHeight = UIApplication.shared.statusBarFrame.size.height
@@ -97,8 +113,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
-        
-        
         self.view.addSubview(topSafeView)
         self.view.addSubview(bottomSafeView)
 
@@ -138,6 +152,14 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
         addButton.setImage(tintedImage, for: .normal)
         addButton.tintColor = .black
+        
+        addButtonBlurView.layer.cornerRadius = addButtonBlurView.frame.height / 2
+        let visualEffectAddButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        visualEffectAddButton.frame = addButtonBlurView.bounds
+        visualEffectAddButton.layer.cornerRadius = addButtonBlurView.frame.height / 2
+        visualEffectAddButton.clipsToBounds = true
+        addButtonBlurView.addSubview(visualEffectAddButton)
+        addButtonBlurView.addSubview(addButton)
         
 //        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
 //        blur.frame = addButton.bounds
@@ -191,6 +213,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         curRow = indexPath.row
         UIView.animate(withDuration: 0.065) {
             self.addButton.layer.opacity = 0.0
+            self.addButtonBlurView.layer.opacity = 0.0
         }
         
         UIView.animate(withDuration: 1) {
@@ -229,10 +252,13 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             destinationVC.delegate = self
             destinationVC.modalPresentationStyle = .popover
             let popOverVC = destinationVC.popoverPresentationController
+//            popOverVC?.sourceView?.layer.opacity = 0.1
             popOverVC?.delegate = self
             popOverVC?.permittedArrowDirections = UIPopoverArrowDirection(rawValue:0)
             popOverVC?.sourceView = self.topSafeView
-            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
+            let screenWidth = UIScreen.main.bounds.width
+
+            destinationVC.preferredContentSize = CGSize(width: screenWidth, height: screenWidth)
         }
     }
     
@@ -293,7 +319,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         self.view.layer.opacity = 1.0
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: {
             UIView.animate(withDuration: 1, animations: {
-                self.addButton.layer.opacity = 0.85
+                self.addButton.layer.opacity = 1.0
+                self.addButtonBlurView.layer.opacity = 1.0
             })
         })
     }
