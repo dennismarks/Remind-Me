@@ -16,6 +16,9 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var addButtonBlurView: UIView!
+    @IBOutlet weak var welcomeLabelOne: UILabel!
+    @IBOutlet weak var welcomeLabelTwo: UILabel!
+    
     
 //    @IBOutlet weak var topSafeView: UIView!
 //    @IBOutlet weak var bottomSafeView: UIView!
@@ -42,7 +45,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (didAllow, error) in }
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
         longPress.minimumPressDuration = 0.3 // optional
@@ -60,29 +62,25 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         
         print("\n")
         
-//        let myview = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-//        myview.backgroundColor = .darkGray
-//        self.view.addSubview(myview)
-//        for family: String in UIFont.familyNames
-//        {
-//            print(family)
-//            for names: String in UIFont.fontNames(forFamilyName: family)
-//            {
-//                print("== \(names)")
-//            }
-//        }
-        
-//        // Find size for blur effect.
-//        let statusBarHeight = UIApplication.shared.statusBarFrame.size.height
-//        let bounds = self.navigationController?.navigationBar.bounds.insetBy(dx: 0, dy: -(statusBarHeight)).offsetBy(dx: 0, dy: -(statusBarHeight))
-//        // Create blur effect.
-//        let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-//        visualEffectView.frame = bounds!
-//        // Set navigation bar up.
-//        self.navigationController?.navigationBar.isTranslucent = true
-//        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-//        self.navigationController?.navigationBar.addSubview(visualEffectView)
-//        self.navigationController?.navigationBar.sendSubviewToBack(visualEffectView)
+        if array.count == 0 {
+            UIView.animate(withDuration: 0.8, animations: {
+                self.welcomeLabelOne.layer.opacity = 1.0
+            }) { (true) in
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.welcomeLabelTwo.layer.opacity = 1.0
+                }) { (true) in
+                    UIView.animate(withDuration: 0.5, animations: {
+                        self.addButton.layer.opacity = 1.0
+                    }) { (true) in
+                        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (didAllow, error) in }
+                    }
+                }
+            }
+        } else {
+            UIView.animate(withDuration: 0.3) {
+                self.addButton.layer.opacity = 1.0
+            }
+        }
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -95,8 +93,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
                     self.view.frame.origin.y -= keyboardSize.height
                 }
                 self.bottomSafeView.layer.opacity = 0.0
-                //            self.tableView.layer.opacity = 0.6
-                //            self.addButton.layer.opacity = 1.0
             }
         }
         
@@ -161,10 +157,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         addButtonBlurView.addSubview(visualEffectAddButton)
         addButtonBlurView.addSubview(addButton)
         
-//        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-//        blur.frame = addButton.bounds
-//        blur.isUserInteractionEnabled = false //This allows touches to forward to the button.
-//        addButton.insertSubview(blur, at: 0)
     }
     
     var openingFrame: CGRect?
@@ -191,11 +183,7 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = Bundle.main.loadNibNamed("CustomCategoryCell", owner: self, options: nil)?.first as! CustomCategoryCell
         cell.nameLabel.text = array[indexPath.row].name
-//        cell.layer.borderWidth = 3
-//        cell.layer.borderColor = UIColor.blue.cgColor
-//        cell.layer.cornerRadius = 15
         cell.selectionStyle = .none
-//        cell.backgroundColor = hexStringToUIColor(hex: colourArray[indexPath.row])
         cell.cellColourString = array[indexPath.row].colour!
         cell.backgroundColor = hexStringToUIColor(hex: array[indexPath.row].colour!)
         cell.nameLabel.textColor = hexStringToUIColor(hex: array[indexPath.row].tintColour!)
@@ -263,14 +251,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func addNewCategory(name: String, colour: String, tint: String) {
-        
-//        if let viewWithTag = self.view.viewWithTag(100) {
-//            UIView.animate(withDuration: 0.5, animations: {
-//                viewWithTag.layer.opacity = 0.0
-//            }) { (true) in
-//                viewWithTag.removeFromSuperview()
-//            }
-//        }
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
@@ -281,6 +261,10 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         category.tintColour = tint
         self.curIndex += 1
         self.array.append(category)
+        if array.count != 0 {
+            self.welcomeLabelOne.layer.opacity = 0.0
+            self.welcomeLabelTwo.layer.opacity = 0.0
+        }
         self.save()
         self.tableView.reloadData()
         print("Saved new category")
@@ -297,17 +281,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func dismissView() {
-        print("Here1")
-//        if let viewWithTag = self.view.viewWithTag(100) {
-//            UIView.animate(withDuration: 0.5, animations: {
-//                viewWithTag.layer.opacity = 0.0
-//            }) { (true) in
-//                viewWithTag.removeFromSuperview()
-//            }
-//        }
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
-//            self.tableView.layer.opacity = 1.0
         }
     }
     
@@ -318,11 +293,12 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     func updateUI() {
         self.view.layer.opacity = 1.0
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: {
-            UIView.animate(withDuration: 1, animations: {
+            UIView.animate(withDuration: 0.3, animations: {
                 self.addButton.layer.opacity = 1.0
                 self.addButtonBlurView.layer.opacity = 1.0
             })
         })
+       
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -330,17 +306,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {
-        
-//        let visualEffectViewTop = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-//        visualEffectViewTop.frame = self.view.bounds
-//        visualEffectViewTop.layer.opacity = 0.0
-//        visualEffectViewTop.tag = 100
-//        self.view.addSubview(visualEffectViewTop)
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 0.6
-//            self.tableView.layer.opacity = 0.6
-            
-//            visualEffectViewTop.layer.opacity = 1.0
         }
         performSegue(withIdentifier: "goToAddCategory", sender: self)
     }
@@ -359,6 +326,16 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
             }
             
             self.curIndex -= 1
+            
+            if self.array.count == 0 {
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.welcomeLabelOne.layer.opacity = 1.0
+                }) { (true) in
+                    UIView.animate(withDuration: 0.8, animations: {
+                        self.welcomeLabelTwo.layer.opacity = 1.0
+                    })
+                }
+            }
             
             self.save()
             completion(true)
