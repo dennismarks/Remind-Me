@@ -281,48 +281,51 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-//        let indexToMove = indexPath.row
-//        let itemToChange = array[indexToMove]
-//        var indexOfFirstDoneEl = 0
-//
-//        var flag = false
-//        for item in array {
-//            if item.done == true {
-//                indexOfFirstDoneEl = Int(item.position)
-//                flag = true
-//                break
-//            }
-//        }
-//
-//        if flag == false {
-//            indexOfFirstDoneEl = array.count
-//        }
-//
-//        if array[indexPath.row].done == false {
-//            for item in array {
-//                if indexToMove < item.position && item.done == false {
-//                    item.position -= 1
-//                }
-//            }
-//            curIndex -= 1
-//            itemToChange.position = Int16(indexOfFirstDoneEl)
-//        } else {
-//            for item in array {
-//                if item.position >= indexOfFirstDoneEl && item != itemToChange {
-//                    item.position += 1
-//                }
-//                if item == itemToChange {
-//
-//                    break
-//                }
-//            }
-//            itemToChange.position = Int16(indexOfFirstDoneEl)
-//        }
-//
-//        array[indexPath.row].done = !array[indexPath.row].done
-//        save()
-//        load()
-//        self.itemTableView.reloadData()
+        if array[indexPath.row].done == false {
+            var indexToInsert = array.count
+            for i in 0...array.count - 1 {
+                if array[i].done == true {
+                    indexToInsert = i
+                    break
+                }
+            }
+            print("index to insert \(indexToInsert)")
+            array[indexPath.row].done = !array[indexPath.row].done
+            let itemToMove = array[indexPath.row]
+            array.remove(at: indexPath.row)
+            if indexToInsert > array.count {
+                array.append(itemToMove)
+            } else {
+                array.insert(itemToMove, at: indexToInsert - 1)
+            }
+        } else {
+            var indexToInsert = 0
+            for i in 0...array.count - 1 {
+                if array[i].done == true {
+                    indexToInsert = i
+                    break
+                }
+            }
+            print("index to insert \(indexToInsert)")
+            array[indexPath.row].done = !array[indexPath.row].done
+            let itemToMove = array[indexPath.row]
+            array.remove(at: indexPath.row)
+            if indexToInsert == 0 {
+                array.insert(itemToMove, at: 0)
+            } else if indexToInsert > array.count {
+                array.append(itemToMove)
+            } else {
+                array.insert(itemToMove, at: indexToInsert)
+            }
+        }
+        
+        for i in 0...array.count - 1 {
+            array[i].position = Int16(i)
+        }
+        
+        save()
+        load()
+        self.itemTableView.reloadData()
 //        for item in array {
 //            print(item.title)
 //        }
