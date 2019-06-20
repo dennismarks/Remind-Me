@@ -42,6 +42,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var curIndexPath: IndexPath?
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var updateButtons = true
+    var didBlur = false
     
     var curIndex = 0
     var from = 0
@@ -168,8 +169,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let visualEffectViewBot = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         visualEffectViewBot.frame = bottomSafeView.bounds
         
-        topSafeView.addSubview(visualEffectViewTop)
-        bottomSafeView.addSubview(visualEffectViewBot)
+        if !didBlur {
+            topSafeView.addSubview(visualEffectViewTop)
+            bottomSafeView.addSubview(visualEffectViewBot)
+        }
 
         let label = UILabel()
         self.view.addSubview(label)
@@ -193,30 +196,36 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         }
         
+        print(self.view.frame.height)
         if self.view.frame.height < 600 && updateButtons {
             for size in self.buttonConstraints! {
                 size.constant *= 0.9
                 addSomeRemindersLabel![0].font = addSomeRemindersLabel![0].font.withSize(32)
                 addSomeRemindersLabel![1].font = addSomeRemindersLabel![1].font.withSize(25)
+                print("BEEN HERE")
                 self.view.layoutIfNeeded()
             }
+        }
+        
+        if !didBlur {
+            addButtonBlurView.layer.cornerRadius = addButtonBlurView.frame.height / 2
+            let visualEffectAddButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+            visualEffectAddButton.frame = addButtonBlurView.bounds
+            visualEffectAddButton.layer.cornerRadius = addButtonBlurView.frame.height / 2
+            visualEffectAddButton.clipsToBounds = true
+            addButtonBlurView.addSubview(visualEffectAddButton)
+            addButtonBlurView.addSubview(addButton)
             
-        addButtonBlurView.layer.cornerRadius = addButtonBlurView.frame.height / 2
-        let visualEffectAddButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-        visualEffectAddButton.frame = addButtonBlurView.bounds
-        visualEffectAddButton.layer.cornerRadius = addButtonBlurView.frame.height / 2
-        visualEffectAddButton.clipsToBounds = true
-        addButtonBlurView.addSubview(visualEffectAddButton)
-        addButtonBlurView.addSubview(addButton)
-
-        backButtonBlurView.layer.cornerRadius = backButtonBlurView.frame.height / 2
-        let visualEffectBackButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-        visualEffectBackButton.frame = backButtonBlurView.bounds
-        visualEffectBackButton.layer.cornerRadius = backButtonBlurView.frame.height / 2
-        visualEffectBackButton.clipsToBounds = true
-        backButtonBlurView.addSubview(visualEffectBackButton)
-        backButtonBlurView.addSubview(backButton)
-            
+            backButtonBlurView.layer.cornerRadius = backButtonBlurView.frame.height / 2
+            let visualEffectBackButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+            visualEffectBackButton.frame = backButtonBlurView.bounds
+            visualEffectBackButton.layer.cornerRadius = backButtonBlurView.frame.height / 2
+            visualEffectBackButton.clipsToBounds = true
+            backButtonBlurView.addSubview(visualEffectBackButton)
+            backButtonBlurView.addSubview(backButton)
+        }
+        
+        didBlur = true
         updateButtons = false
 
 //        print("button loc \(addButtonBlurView)")
@@ -230,18 +239,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //            addButtonBlurView.frame.size.height = 45
 //            addButtonBlurView.frame.size.width = 45
             
-        }
+        
         
     }
-    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(true)
-//        UIApplication.shared.isStatusBarHidden = false
-//        var prefersStatusBarHidden: Bool {
-//            return false
-//        }
-//    }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let data = array[indexPath.row] as Item
@@ -405,10 +405,22 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             destinationVC.modalPresentationStyle = .popover
             let popOverVC = destinationVC.popoverPresentationController
             popOverVC?.delegate = self
+            
+//            popOverVC?.sourceView = self.addButtonBlurView
+            
             popOverVC?.sourceView = self.addButtonBlurView
-            print("Height \(self.bottomSafeView.frame.height)")
-            popOverVC?.sourceRect = CGRect(x: self.addButtonBlurView.bounds.midX, y: self.addButtonBlurView.bounds.minY, width: 0, height: 0)
-            destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
+            print("Height \(self.view.frame.height)")
+            if self.view.frame.height < 600 {
+//                addSomeRemindersLabel![0].centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: -20).isActive = true
+                self.view.layoutIfNeeded()
+                popOverVC?.permittedArrowDirections = .init(rawValue: 0)
+                popOverVC?.sourceRect = CGRect(x: self.view.bounds.maxX, y: self.view.bounds.maxY, width: 0, height: 0)
+                destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width * 0.5)
+            } else {
+                popOverVC?.sourceRect = CGRect(x: self.addButtonBlurView.bounds.midX, y: self.addButtonBlurView.bounds.minY, width: 0, height: 0)
+                destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
+            }
+            
         } else if segue.identifier == "goToEditItem" {
             let destinationVC = segue.destination as! EditItemViewController
             let cell = self.itemTableView.cellForRow(at: curIndexPath!) as! CustomItemCell
@@ -423,7 +435,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             if cell.reminderLabel.text != "" {
                 destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width)
             } else {
-                destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
+                destinationVC.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width * 0.5)
             }
         }
     }
@@ -469,18 +481,15 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         // declare the content of the notification:
         let content = UNMutableNotificationContent()
         content.sound = UNNotificationSound.default
-//        content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "out.caf"))
         content.title = selectedCategory!.name!
-//        content.subtitle = "Notification Subtitle"
         content.body = item.title!
-        
         
         // declaring the trigger
         let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.date)
         let calendarTrigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
 
         // creating a request and add it to the notification center
-        let request = UNNotificationRequest(identifier: "notification-identifier", content: content, trigger: calendarTrigger)
+        let request = UNNotificationRequest(identifier: name, content: content, trigger: calendarTrigger)
         UNUserNotificationCenter.current().add(request)
         
         if array.count > 0 {
@@ -498,6 +507,16 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         array[(curIndexPath?.row)!].setValue(nil, forKey: "reminderDateType")
         array[(curIndexPath?.row)!].setValue("", forKey: "reminder")
         array[(curIndexPath?.row)!].setValue(name, forKey: "title")
+        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+            var identifiers: [String] = []
+            for notification:UNNotificationRequest in notificationRequests {
+                if notification.identifier == name {
+                    identifiers.append(notification.identifier)
+                }
+            }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
         save()
         self.itemTableView.reloadData()
     }
@@ -509,6 +528,20 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         array[(curIndexPath?.row)!].setValue(reminder.date, forKey: "reminderDateType")
         array[(curIndexPath?.row)!].setValue(time, forKey: "reminder")
         array[(curIndexPath?.row)!].setValue(name, forKey: "title")
+        // declare the content of the notification:
+        let content = UNMutableNotificationContent()
+        content.sound = UNNotificationSound.default
+        content.title = selectedCategory!.name!
+        content.body = name
+        
+        // declaring the trigger
+        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.date)
+        let calendarTrigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+        
+        // creating a request and add it to the notification center
+        let request = UNNotificationRequest(identifier: name, content: content, trigger: calendarTrigger)
+        
+        UNUserNotificationCenter.current().add(request)
         save()
         self.itemTableView.reloadData()
     }
@@ -520,6 +553,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.view.layer.opacity = 1.0
         }
         updateButtons = false
+        didBlur = true
     }
     
     func save() {
