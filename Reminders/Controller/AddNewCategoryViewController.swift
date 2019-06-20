@@ -42,6 +42,7 @@ class AddNewCategoryViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidDisappear(true)
+        categoryNameTextField.resignFirstResponder()
         chosenColour = colourArray[0]
         chosenTint = tintColourArray[0]
 //        UIView.animate(withDuration: 0.5) {
@@ -51,7 +52,18 @@ class AddNewCategoryViewController: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(true)
+        categoryNameTextField.resignFirstResponder()
+
         self.delegate?.dismissView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        print("Size \(self.view.frame.height)")
+        if self.view.frame.height < 340 {
+            categoryNameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+            buttonsStackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -6).isActive = true
+        }
     }
     
     @IBAction func dismissPressed(_ sender: UIButton) {
@@ -60,12 +72,15 @@ class AddNewCategoryViewController: UIViewController {
 //            self.delegate?.dismissView()
 //            self.dismiss(animated: true, completion: nil)
 //        })
+        categoryNameTextField.resignFirstResponder()
 
         self.delegate?.dismissView()
         self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func addNewCategoryPressed(_ sender: UIButton) {
+        categoryNameTextField.resignFirstResponder()
+
         if let name = categoryNameTextField.text {
             self.delegate?.addNewCategory(name: name, colour: chosenColour, tint: chosenTint)
         }
@@ -96,13 +111,17 @@ extension AddNewCategoryViewController: UIPickerViewDelegate, UIPickerViewDataSo
         label.textAlignment = .center
         label.text = colourNames[row]
         label.textColor = hexStringToUIColor(hex: tintColourArray[row])
-        label.font = UIFont(name: "AvenirNext-Regular", size: 22.0)
+        label.font = UIFont(name: "SFProText-Regular", size: 19.0)
         
         return label
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-        return CGFloat(integerLiteral: 40)
+        if self.view.frame.height < 250 {
+            return CGFloat(integerLiteral: 30)
+        } else {
+            return CGFloat(integerLiteral: 40)
+        }
     }
     
 //    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
