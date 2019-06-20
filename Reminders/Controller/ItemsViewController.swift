@@ -23,10 +23,11 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var addButtonBlurView: UIView!
     
-//    @IBOutlet weak var bottomSafeView: UIView!
-//    @IBOutlet weak var topSafeView: UIView!
     @IBOutlet weak var tableViewFooter: UIView!
-    @IBOutlet var addSomeRemindersLabel:[UILabel]?
+    @IBOutlet var addSomeRemindersLabel: [UILabel]?
+    @IBOutlet var buttonConstraints: [NSLayoutConstraint]?
+    
+    
     
     var selectedCategory : Category? {
         // what should happen when a variable gets set with a new value
@@ -40,6 +41,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var array = [Item]()
     var curIndexPath: IndexPath?
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var updateButtons = true
     
     var curIndex = 0
     var from = 0
@@ -86,6 +88,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         curIndex = array.count
         
+        print("Height \(self.view.frame.height)")
+        
         
 //        self.itemTableView?.frame = CGRect(x: 0, y: height, width: UIScreen.mainScreen.bounds.width, height: (UIScreen.mainScreen().bounds.height - height))
         
@@ -106,21 +110,15 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {
-//        if moveView {
         print("Show \(self.addButtonBlurView.frame.origin.y)")
             if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-//                keySize = keyboardSize.height
                 if self.view.frame.origin.y == 0 {
                     print("Keyboard \(keyboardSize.height)")
                     self.view.frame.origin.y = self.view.frame.origin.y - keyboardSize.height + self.bottomSafeView.frame.height
-//                    self.addButtonBlurView.frame.origin.y = self.addButtonBlurView.frame.origin.y - keyboardSize.height + self.bottomSafeView.frame.height
-                }
-//                self.bottomSafeView.layer.opacity = 0.0
-                //            self.tableView.layer.opacity = 0.6
-                //            self.addButton.layer.opacity = 1.0
-            }
-//        }
 
+                }
+
+            }
     }
 
     @objc func keyboardWillHide(notification: NSNotification) {
@@ -195,7 +193,14 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         }
         
-        
+        if self.view.frame.height < 600 && updateButtons {
+            for size in self.buttonConstraints! {
+                size.constant *= 0.9
+                addSomeRemindersLabel![0].font = addSomeRemindersLabel![0].font.withSize(32)
+                addSomeRemindersLabel![1].font = addSomeRemindersLabel![1].font.withSize(25)
+                self.view.layoutIfNeeded()
+            }
+            
         addButtonBlurView.layer.cornerRadius = addButtonBlurView.frame.height / 2
         let visualEffectAddButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         visualEffectAddButton.frame = addButtonBlurView.bounds
@@ -211,18 +216,31 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         visualEffectBackButton.clipsToBounds = true
         backButtonBlurView.addSubview(visualEffectBackButton)
         backButtonBlurView.addSubview(backButton)
+            
+        updateButtons = false
 
-        print("button loc \(addButtonBlurView)")
+//        print("button loc \(addButtonBlurView)")
+        
+
+//            addButtonBlurView.translatesAutoresizingMaskIntoConstraints = false
+//            addButtonBlurView.heightAnchor.constraint(equalToConstant: 45).isActive = true
+//            addButtonBlurView.widthAnchor.constraint(equalToConstant: 45).isActive = true
+//            addButtonBlurView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 16).isActive = true
+//            addButtonBlurView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//            addButtonBlurView.frame.size.height = 45
+//            addButtonBlurView.frame.size.width = 45
+            
+        }
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(true)
-        UIApplication.shared.isStatusBarHidden = false
-        var prefersStatusBarHidden: Bool {
-            return false
-        }
-    }
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(true)
+//        UIApplication.shared.isStatusBarHidden = false
+//        var prefersStatusBarHidden: Bool {
+//            return false
+//        }
+//    }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -230,47 +248,26 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
         cell.reminderLabel.text = data.reminder
+        
         if data.reminder == "" {
             cell.topSpace.isActive = false
             cell.bottomSpace.isActive = false
             cell.titleLabel.translatesAutoresizingMaskIntoConstraints = false
             cell.titleLabel.leadingAnchor.constraint(equalTo: cell.cellContentView.leadingAnchor, constant: 28).isActive = true
             cell.titleLabel.centerYAnchor.constraint(equalTo: cell.cellContentView.centerYAnchor).isActive = true
-//            print(cell.titleLabel.constraints)
         }
-//        cell.accessoryType = data.done ? .checkmark : .none
+        
         cell.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         cell.tintColor = .white
         cell.titleLabel.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         cell.reminderLabel.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
-//        let doneImage = UIImage(named: "done.png")?.withRenderingMode(.alwaysTemplate)
-////        let circleImage = UIImage(named: "circle.png")?.withRenderingMode(.alwaysTemplate)
+
         if (data.done) {
             cell.titleLabel.layer.opacity = 0.4
             cell.reminderLabel.layer.opacity = 0.4
         }
-//        else {
-//            cell.doneButton.setImage(circleImage, for: .normal)
-//        }
-//        cell.doneButton.tintColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
-        cell.separationLine.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
-//        cell.doneButton.layer.cornerRadius = 14.0
-//        cell.doneButton.layer.shadowColor = UIColor.black.cgColor
-//        cell.doneButton.layer.shadowRadius = 5.0
-//        cell.doneButton.layer.shadowOpacity = 0.1
-//        cell.doneButton.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
-        
-    
 
-        
-//        cell.backgroundColor = (cell.accessoryType == .checkmark) ? UIColor(rgb: 0xBDBDBD).withAlphaComponent(0.3) : UIColor.white
-//        cell.titleLabel?.textColor = (cell.accessoryType == .checkmark) ? UIColor.red : UIColor.black
-        
-//        if cell.accessoryType == .checkmark {
-//            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: cell.titleLabel.text!)
-//            attributeString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributeString.length))
-//            cell.textLabel?.attributedText = attributeString
-//        }
+        cell.separationLine.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         
         return cell
     }
@@ -522,6 +519,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
+        updateButtons = false
     }
     
     func save() {
