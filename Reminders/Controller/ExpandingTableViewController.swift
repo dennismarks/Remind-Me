@@ -18,6 +18,8 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet weak var addButtonBlurView: UIView!
     @IBOutlet weak var welcomeLabelOne: UILabel!
     @IBOutlet weak var welcomeLabelTwo: UILabel!
+    @IBOutlet var buttonConstraints: [NSLayoutConstraint]?
+
     
     
 //    @IBOutlet weak var topSafeView: UIView!
@@ -44,7 +46,6 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
         longPress.minimumPressDuration = 0.3 // optional
@@ -149,6 +150,14 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         addButton.setImage(tintedImage, for: .normal)
         addButton.tintColor = .black
         
+        if self.view.frame.height < 600 {
+            for size in buttonConstraints! {
+                size.constant *= 0.95
+                self.view.layoutIfNeeded()
+            }
+        }
+        
+        
         addButtonBlurView.layer.cornerRadius = addButtonBlurView.frame.height / 2
         let visualEffectAddButton = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         visualEffectAddButton.frame = addButtonBlurView.bounds
@@ -183,10 +192,14 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = Bundle.main.loadNibNamed("CustomCategoryCell", owner: self, options: nil)?.first as! CustomCategoryCell
         cell.nameLabel.text = array[indexPath.row].name
+        cell.nameLabel.font = UIFontMetrics.default.scaledFont(for: cell.nameLabel.font)
         cell.selectionStyle = .none
         cell.cellColourString = array[indexPath.row].colour!
         cell.backgroundColor = hexStringToUIColor(hex: array[indexPath.row].colour!)
         cell.nameLabel.textColor = hexStringToUIColor(hex: array[indexPath.row].tintColour!)
+        if self.view.frame.height < 600 {
+            cell.nameLabel.font = cell.nameLabel.font.withSize(31)
+        }
         return cell
     }
 
@@ -302,7 +315,11 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        if self.view.frame.height < 600 {
+            return 90
+        } else {
+            return 100
+        }
     }
     
     @IBAction func addButtonPressed(_ sender: UIButton) {

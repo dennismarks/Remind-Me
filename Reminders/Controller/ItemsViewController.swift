@@ -247,7 +247,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let data = array[indexPath.row] as Item
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
         cell.titleLabel.text = data.title
+        cell.titleLabel.font = UIFontMetrics.default.scaledFont(for: cell.titleLabel.font)
         cell.reminderLabel.text = data.reminder
+        cell.reminderLabel.font = UIFontMetrics.default.scaledFont(for: cell.reminderLabel.font)
         
         if data.reminder == "" {
             cell.topSpace.isActive = false
@@ -449,7 +451,23 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         item.parentCategory = self.selectedCategory
         item.position = Int16(self.curIndex)
         curIndex += 1
-        self.array.append(item)
+        var indexOfFirstDone = -1
+        for el in array {
+            if el.done {
+                indexOfFirstDone = Int(el.position)
+                break
+            }
+        }
+        if indexOfFirstDone == -1 {
+            array.append(item)
+        } else {
+            array.insert(item, at: indexOfFirstDone)
+        }
+        
+        for i in 0...array.count - 1 {
+            array[i].position = Int16(i)
+        }
+        
         self.save()
         self.itemTableView.reloadData()
         if array.count > 0 {

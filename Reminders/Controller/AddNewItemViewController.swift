@@ -36,7 +36,6 @@ class AddNewItemViewController: UIViewController {
             self.preferredContentSize = CGSize(width: self.view.frame.width, height: self.view.frame.width * 0.5)
 
         })
-        
 //        self.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
     }
     
@@ -45,9 +44,12 @@ class AddNewItemViewController: UIViewController {
         if self.view.frame.height < 340 {
             stackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
             itemNameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 6).isActive = true
+            itemNameTextField.font = itemNameTextField.font?.withSize(23)
 //            buttonsStackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
 //            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -6).isActive = true
         }
+        itemNameTextField.font = UIFontMetrics.default.scaledFont(for: itemNameTextField.font!)
+        addReminderButton.titleLabel?.font = UIFontMetrics.default.scaledFont(for: addReminderButton.titleLabel!.font)
 //        if showArrow {
 //        }
     }

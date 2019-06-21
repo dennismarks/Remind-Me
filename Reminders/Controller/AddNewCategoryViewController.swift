@@ -58,12 +58,14 @@ class AddNewCategoryViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        print("Size \(self.view.frame.height)")
+//        print("Size \(self.view.frame.height)")
         if self.view.frame.height < 340 {
+            categoryNameTextField.font = categoryNameTextField.font?.withSize(23)
             categoryNameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-            buttonsStackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
-            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -6).isActive = true
+            buttonsStackView.heightAnchor.constraint(equalToConstant: 45).isActive = true
+            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -12).isActive = true
         }
+        categoryNameTextField.font = UIFontMetrics.default.scaledFont(for: categoryNameTextField.font!)
     }
     
     @IBAction func dismissPressed(_ sender: UIButton) {
@@ -112,6 +114,7 @@ extension AddNewCategoryViewController: UIPickerViewDelegate, UIPickerViewDataSo
         label.text = colourNames[row]
         label.textColor = hexStringToUIColor(hex: tintColourArray[row])
         label.font = UIFont(name: "SFProText-Regular", size: 19.0)
+        label.font = UIFontMetrics.default.scaledFont(for: label.font)
         
         return label
     }
