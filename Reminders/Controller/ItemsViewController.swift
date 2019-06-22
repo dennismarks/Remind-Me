@@ -64,7 +64,6 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     for label in self.addSomeRemindersLabel! {
                         label.layer.opacity = 1.0
                     }
-                    
                 }
                 self.backButton.layer.opacity = 1.0
                 self.addButton.layer.opacity = 1.0
@@ -90,6 +89,9 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         curIndex = array.count
         
         print("Height \(self.view.frame.height)")
+        
+        self.itemTableView.contentInset = UIEdgeInsets(top: -9, left: 0, bottom: 0, right: 0);
+        
         
         
 //        self.itemTableView?.frame = CGRect(x: 0, y: height, width: UIScreen.mainScreen.bounds.width, height: (UIScreen.mainScreen().bounds.height - height))
@@ -159,6 +161,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         topSafeView.heightAnchor.constraint(equalToConstant: safeFrame.minY + 26).isActive = true
         topSafeView.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
         topSafeView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        // + 26
         topSafeView.frame.size.height = safeFrame.minY + 26
         topSafeView.frame.size.width = view.frame.width
         
@@ -190,7 +193,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableViewFooter.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.colour)!)
         
         itemTableView.estimatedRowHeight = 100
-        itemTableView.rowHeight = UITableView.automaticDimension
+//        itemTableView.rowHeight = UITableView.automaticDimension
         
         for label in addSomeRemindersLabel! {
             label.textColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
@@ -243,6 +246,20 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.frame.size.height = 0
+        view.frame.size.width = self.view.frame.width
+        view.backgroundColor = .red
+        return view
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let height: CGFloat = UITableView.automaticDimension
+        print("--> \(height)")
+        return height
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let data = array[indexPath.row] as Item
         let cell = Bundle.main.loadNibNamed("CustomItemCell", owner: self, options: nil)?.first as! CustomItemCell
@@ -271,7 +288,21 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
         cell.separationLine.backgroundColor = hexStringToUIColor(hex: (selectedCategory?.tintColour)!)
         
+        cell.selectionStyle = .none
+        
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath) as! CustomItemCell
+//        cell.titleLabel.textColor = cell.titleLabel.textColor.lighterColor
+//        cell.reminderLabel.textColor = cell.reminderLabel.textColor.lighterColor
+        cell.titleLabel.font = cell.titleLabel.font.withSize(cell.titleLabel.font.pointSize + 0.3)
+        cell.reminderLabel.font = cell.titleLabel.font.withSize(cell.reminderLabel.font.pointSize + 0.3)
+    }
+    
+    func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        tableView.cellForRow(at: indexPath)?.textLabel?.layer.opacity = 1.0
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -653,5 +684,26 @@ extension UIView {
         return renderer.image { rendererContext in
             layer.render(in: rendererContext.cgContext)
         }
+    }
+}
+
+
+extension UIColor {
+    
+    var lighterColor: UIColor {
+        return lighterColor(removeSaturation: 0.5, resultAlpha: -1)
+    }
+    
+    func lighterColor(removeSaturation val: CGFloat, resultAlpha alpha: CGFloat) -> UIColor {
+        var h: CGFloat = 0, s: CGFloat = 0
+        var b: CGFloat = 0, a: CGFloat = 0
+        
+        guard getHue(&h, saturation: &s, brightness: &b, alpha: &a)
+            else {return self}
+        
+        return UIColor(hue: h,
+                       saturation: max(s - val, 0.0),
+                       brightness: b,
+                       alpha: alpha == -1 ? a : alpha)
     }
 }
