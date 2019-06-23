@@ -202,6 +202,20 @@ class ExpandingTableViewController: UIViewController, UITableViewDelegate, UITab
         }
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath) as! CustomCategoryCell
+        UIView.animate(withDuration: 0.5) {
+            cell.nameLabel.font = cell.nameLabel.font.withSize(cell.nameLabel.font.pointSize + 8)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath) as! CustomCategoryCell
+        UIView.animate(withDuration: 0.5) {
+            cell.nameLabel.font = cell.nameLabel.font.withSize(cell.nameLabel.font.pointSize - 8)
+        }
+    }
 
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
