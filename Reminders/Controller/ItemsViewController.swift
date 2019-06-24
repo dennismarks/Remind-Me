@@ -27,6 +27,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet var addSomeRemindersLabel: [UILabel]?
     @IBOutlet var buttonConstraints: [NSLayoutConstraint]?
     
+    var moveView = true
     
     
     var selectedCategory : Category? {
@@ -57,6 +58,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         self.itemTableView.backgroundColor = hexStringToUIColor(hex: tableViewColour)
         itemTableView.separatorStyle = .none
+        
+        bottomSafeView.layer.isHidden = true
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {
             UIView.animate(withDuration: 0.4, animations: {
@@ -113,15 +116,13 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {
-        print("Show \(self.addButtonBlurView.frame.origin.y)")
+        if moveView {
             if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                 if self.view.frame.origin.y == 0 {
-                    print("Keyboard \(keyboardSize.height)")
                     self.view.frame.origin.y = self.view.frame.origin.y - keyboardSize.height + self.bottomSafeView.frame.height
-
                 }
-
             }
+        }
     }
 
     @objc func keyboardWillHide(notification: NSNotification) {
@@ -278,7 +279,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         let curDate = Date()
         if let time = data.reminderDateType {
-            if time < curDate {
+            if time < curDate && !data.done {
                 cell.reminderLabel.textColor = hexStringToUIColor(hex: "#F52500")
             }
         }
@@ -387,11 +388,11 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.performSegue(withIdentifier: "goToEditItem", sender: self)
             completion(true)
         }
-        let shareAction = UIContextualAction(style: .normal, title: .none) { (action, view, completion) in
-            let activityVC = UIActivityViewController(activityItems: ["Hello"], applicationActivities: nil)
-            self.present(activityVC, animated: true, completion: nil)
-            completion(true)
-        }
+//        let shareAction = UIContextualAction(style: .normal, title: .none) { (action, view, completion) in
+//            let activityVC = UIActivityViewController(activityItems: ["Hello"], applicationActivities: nil)
+//            self.present(activityVC, animated: true, completion: nil)
+//            completion(true)
+//        }
 
         deleteAction.image = UIImage(named: "delete")
         deleteAction.backgroundColor = hexStringToUIColor(hex: "#DE615F")
@@ -401,10 +402,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         editAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
 //        editAction.backgroundColor = .black
         
-        shareAction.image = UIImage(named: "share")
-        shareAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
+//        shareAction.image = UIImage(named: "share")
+//        shareAction.backgroundColor = hexStringToUIColor(hex: "#FBBB04")
         
-        return UISwipeActionsConfiguration(actions: [deleteAction, editAction, shareAction])
+        return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
     @objc func singleTapped() {
@@ -458,6 +459,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             }
             
         } else if segue.identifier == "goToEditItem" {
+            moveView = false
             let destinationVC = segue.destination as! EditItemViewController
             let cell = self.itemTableView.cellForRow(at: curIndexPath!) as! CustomItemCell
             destinationVC.itemName = cell.titleLabel!.text!
@@ -527,7 +529,34 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         item.parentCategory = self.selectedCategory
         item.position = Int16(self.curIndex)
         curIndex += 1
-        self.array.append(item)
+//        self.array.append(item)
+        
+        var indexOfFirstDone = -1
+        for el in array {
+            if el.done {
+                indexOfFirstDone = Int(el.position)
+                break
+            }
+        }
+        if indexOfFirstDone == -1 {
+            array.append(item)
+        } else {
+            array.insert(item, at: indexOfFirstDone)
+        }
+        
+        for i in 0...array.count - 1 {
+            array[i].position = Int16(i)
+        }
+        
+        self.save()
+        self.itemTableView.reloadData()
+        if array.count > 0 {
+            UIView.animate(withDuration: 0.5) {
+                for label in self.addSomeRemindersLabel! {
+                    label.layer.opacity = 0
+                }
+            }
+        }
         
         
         // declare the content of the notification:
@@ -544,6 +573,8 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let request = UNNotificationRequest(identifier: name, content: content, trigger: calendarTrigger)
         UNUserNotificationCenter.current().add(request)
         
+        self.save()
+        self.itemTableView.reloadData()
         if array.count > 0 {
             UIView.animate(withDuration: 0.5) {
                 for label in self.addSomeRemindersLabel! {
@@ -551,11 +582,10 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
             }
         }
-        self.save()
-        self.itemTableView.reloadData()
     }
     
     func editItem(name: String) {
+        self.moveView = true
         array[(curIndexPath?.row)!].setValue(nil, forKey: "reminderDateType")
         array[(curIndexPath?.row)!].setValue("", forKey: "reminder")
         array[(curIndexPath?.row)!].setValue(name, forKey: "title")
@@ -574,6 +604,7 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func editItem(name: String, reminder: UIDatePicker) {
+        self.moveView = true
         let formatter = DateFormatter()
         formatter.setLocalizedDateFormatFromTemplate("EEE, MMM d hh:mm aaa")
         let time = formatter.string(from: reminder.date)
@@ -598,9 +629,12 @@ class ItemsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.itemTableView.reloadData()
     }
     
-    
+    func dismissEditView() {
+        self.moveView = true
+    }
     
     func dismissView() {
+        self.moveView = true
         UIView.animate(withDuration: 0.5) {
             self.view.layer.opacity = 1.0
         }
