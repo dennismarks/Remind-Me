@@ -41,12 +41,18 @@ class AddNewItemViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        print("---> \(self.view.frame.height)")
         if self.view.frame.height < 340 {
             stackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
             itemNameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 6).isActive = true
             itemNameTextField.font = itemNameTextField.font?.withSize(23)
 //            buttonsStackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
 //            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -6).isActive = true
+        }
+        if self.view.frame.height < 390 {
+            stackView.heightAnchor.constraint(equalToConstant: 48).isActive = true
+            datePickerView.heightAnchor.constraint(equalToConstant: 135).isActive = true
+            self.view.layoutIfNeeded()
         }
         itemNameTextField.font = UIFontMetrics.default.scaledFont(for: itemNameTextField.font!)
         addReminderButton.titleLabel?.font = UIFontMetrics.default.scaledFont(for: addReminderButton.titleLabel!.font)
