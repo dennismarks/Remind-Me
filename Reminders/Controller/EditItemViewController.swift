@@ -11,12 +11,11 @@ import UIKit
 protocol UpdateUIAfterEditItemDelegate {
     func editItem(name: String)
     func editItem(name: String, reminder: UIDatePicker)
+    func dismissEditView()
 }
 
 class EditItemViewController: UIViewController {
 
-    
-    
     var itemName = ""
     var reminderDate: Date?
     var active = false
@@ -50,14 +49,18 @@ class EditItemViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-//        print("---> \(self.view.frame.height)")
-        if self.view.frame.height < 175 {
+        print("---> \(self.view.frame.height)")
+        if self.view.frame.height < 340 {
             stackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
             newItemName.topAnchor.constraint(equalTo: view.topAnchor, constant: 6).isActive = true
             newItemName.font = newItemName.font?.withSize(23)
+            datePickerHeight.constant = 130
+            self.view.layoutIfNeeded()
             //            buttonsStackView.heightAnchor.constraint(equalToConstant: 40).isActive = true
             //            buttonsStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -6).isActive = true
         }
+        newItemName.font = UIFontMetrics.default.scaledFont(for: newItemName.font!)
+        addReminderButton.titleLabel?.font = UIFontMetrics.default.scaledFont(for: addReminderButton.titleLabel!.font)
     }
     
     @IBAction func savePressed(_ sender: UIButton) {
@@ -77,6 +80,7 @@ class EditItemViewController: UIViewController {
     
     
     @IBAction func dismissPressed(_ sender: UIButton) {
+        self.delegate?.dismissEditView()
         self.dismiss(animated: true, completion: nil)
     }
     
